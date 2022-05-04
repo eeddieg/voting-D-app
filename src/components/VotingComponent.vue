@@ -3,8 +3,8 @@
     <ElectorateComponent />
   </div>
   <div class="container mt-5">
-    <h4>Owner account: {{ currentAddress }}</h4>
-    <h4>Contract address: {{ contractAddress }}</h4>
+    <h5>Owner account: {{ currentAddress }}</h5>
+    <h5>Contract address: {{ contractAddress }}</h5>
   </div>
 </template>
 

@@ -1,21 +1,11 @@
 <template>
   <div class="container">
-    <h1 class="p-3 text-center">Voting Procedure</h1>
-    <div class="container mt-3">
-      <button
-        class="btn btn-outline-dark"
-        @click="startVoting"
-        v-show="isVisible"
-      >
-        Begin Voting
-      </button>
-    </div>
-    <div class="container mt-3" v-show="!isVisible">
-      <h4>Voting procedure has started!</h4>
-    </div>
-    <div class="container mt-5">
-      <CastVoteComponent />
-    </div>
+    <h1>Cast Vote</h1>
+  </div>
+  <div class="container mt-3">
+    <button class="btn btn-outline-primary" @click="castVote">
+      Intialize Electorate
+    </button>
   </div>
 </template>
 
@@ -26,13 +16,9 @@ import store from "@/store";
 import ABI from "@/store/abi";
 import ContractAddress from "@/store/contractAddress";
 import { State } from "@/store/interfaces";
-import CastVoteComponent from "@/components/CastVoteComponent.vue";
 
 export default defineComponent({
-  name: "ElectionsComponent",
-  components: {
-    CastVoteComponent,
-  },
+  name: "CastVoteComponent",
   data() {
     return {
       accounts: [],
@@ -65,21 +51,25 @@ export default defineComponent({
     async fetchVotingStatus() {
       const contract = store.getters.ContractAsSigner;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.state().then((res: any) => {
         if (res == State.Created) {
           this.isVisible = true;
         }
       });
     },
-    async startVoting() {
+    async castVote() {
       this.isVisible = false;
-      const contract = store.getters.ContractAsSigner;
 
-      await contract.startVote().then((res: any) => {
-        // console.log(res);
-      });
-      store.dispatch("storeVotingStatus", State.Voting);
-      console.log(store.getters.VotingStatus);
+      console.log(store.getters.Bytecode);
+
+      //   const contract = store.getters.ContractAsSigner;
+
+      //   await contract.startVote().then((res: any) => {
+      //     // console.log(res);
+      //   });
+      //   store.dispatch("storeVotingStatus", State.Voting);
+      //   console.log(store.getters.VotingStatus);
     },
   },
 });

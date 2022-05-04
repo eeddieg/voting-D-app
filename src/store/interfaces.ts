@@ -14,7 +14,7 @@ interface PollingStation {
 interface Voter {
   isEnrolled: boolean;
   hasVoted: boolean;
-  indexProposal: number;
+  choice: number;
   enrolledPollingStationID: number;
   votedPollingStationID: number;
 }

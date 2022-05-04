@@ -3,9 +3,11 @@ import { State } from "./interfaces";
 
 export default createStore({
   state: {
+    abi: {},
     accounts: [],
     accountsListVisible: false,
     ballot: [],
+    bytecode: {},
     contract: {},
     contractAsSigner: {},
     electorateStatus: false,
@@ -19,11 +21,17 @@ export default createStore({
     votingStatus: State.Created,
   },
   getters: {
+    ABI(state) {
+      return state.abi;
+    },
     Accounts(state) {
       return state.accounts;
     },
     Ballot(state) {
       return state.ballot;
+    },
+    Bytecode(state) {
+      return state.bytecode;
     },
     Contract(state) {
       return state.contract;
@@ -63,6 +71,9 @@ export default createStore({
     },
   },
   mutations: {
+    setABI(state, payload) {
+      state.abi = payload;
+    },
     setAcounts(state, payload) {
       state.accounts = payload;
     },
@@ -71,6 +82,9 @@ export default createStore({
     },
     setBallot(state, payload) {
       state.ballot = payload;
+    },
+    setBytecode(state, payload) {
+      state.bytecode = payload;
     },
     setContract(state, payload) {
       state.contract = payload;
@@ -107,6 +121,9 @@ export default createStore({
     },
   },
   actions: {
+    storeABI({ commit }, payload) {
+      commit("setABI", payload);
+    },
     storeAccounts({ commit }, payload) {
       commit("setAcounts", payload);
     },
@@ -115,6 +132,9 @@ export default createStore({
     },
     storeBallot({ commit }, payload) {
       commit("setBallot", payload);
+    },
+    storeBytecode({ commit }, payload) {
+      commit("setBytecode", payload);
     },
     toggleConnectionStatus({ commit }, payload) {
       commit("setConnectionStatus", payload);

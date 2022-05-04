@@ -3,10 +3,10 @@
     <h1 class="p-3 text-center">Elections</h1>
     <div class="container mt-3">
       <article v-show="ElectorateStatus">
-        <strong>
+        <h4>
           Electorate is initiallized and counts
           {{ totalRegisteredVoters }} voters
-        </strong>
+        </h4>
       </article>
       <button
         class="btn btn-outline-dark"

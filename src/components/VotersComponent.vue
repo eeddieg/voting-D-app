@@ -1,52 +1,65 @@
 <template>
   <div class="container">
     <h1 class="p-3 text-center">Voter Registry</h1>
-    <div class="container mt-3">
-      <button
-        class="btn btn-outline-dark"
-        @click="displayRegistry"
-        v-show="!showRegistry"
-      >
-        Show Registry
-      </button>
-      <button
-        class="btn btn-outline-dark"
-        @click="displayRegistry"
+    <div class="container mt-3" v-show="!isRegistrationCompleted">
+      <h3>
+        There are no voters registered yet. Please initialize electorate from
+        Vote tab.
+      </h3>
+    </div>
+    <div class="container mt-3" v-show="isRegistrationCompleted">
+      <div class="container mt-3">
+        <button
+          class="btn btn-outline-dark"
+          @click="displayRegistry"
+          v-show="!showRegistry"
+        >
+          Show Registry
+        </button>
+        <button
+          class="btn btn-outline-dark"
+          @click="displayRegistry"
+          v-show="showRegistry"
+        >
+          Hide Registry
+        </button>
+      </div>
+      <div
+        id="table"
+        class="row justify-content-center mt-5"
         v-show="showRegistry"
       >
-        Hide Registry
-      </button>
-    </div>
-    <div
-      id="table"
-      class="row justify-content-center mt-5"
-      v-show="showRegistry"
-    >
-      <div class="col-auto">
-        <table class="table table-responsive table-striped w-auto">
-          <thead>
-            <tr>
-              <th scope="col">Voter Registered</th>
-              <th scope="col">Voter Voted</th>
-              <th scope="col">Vote</th>
-              <th scope="col">Registration P. Station ID</th>
-              <th scope="col">Vote P. Station ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr scope="row" v-for="voter in registry" :key="voter.id">
-              <td>{{ voter.isEnrolled ? "YES" : "NO" }}</td>
-              <td>{{ voter.hasVoted ? "YES" : "NO" }}</td>
-              <td>{{ voter.indexProposal }}</td>
-              <td>{{ voter.enrolledPollingStationID }}</td>
-              <td>{{ voter.votedPollingStationID }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="container mt-5">
-        <h4>Owner account: {{ currentAddress }}</h4>
-        <h4>Contract address: {{ contractAddress }}</h4>
+        <div class="col-auto">
+          <table class="table table-responsive table-striped w-auto">
+            <thead>
+              <tr>
+                <th scope="col">Voter Registered</th>
+                <th scope="col">Voter Voted</th>
+                <th scope="col">Vote</th>
+                <th scope="col">Registration P. Station ID</th>
+                <th scope="col">Vote P. Station ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr scope="row" v-for="voter in registry" :key="voter.id">
+                <td>{{ voter.isEnrolled ? "YES" : "NO" }}</td>
+                <td>{{ voter.hasVoted ? "YES" : "NO" }}</td>
+                <td>{{ voter.indexProposal }}</td>
+                <td>{{ voter.enrolledPollingStationID }}</td>
+                <td>{{ voter.votedPollingStationID }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <article>
+            <div>
+              <h3>Number of Voters Registered: {{ totalRegisteredVoters }}</h3>
+            </div>
+          </article>
+        </div>
+        <div class="container mt-5">
+          <h4>Owner account: {{ currentAddress }}</h4>
+          <h4>Contract address: {{ contractAddress }}</h4>
+        </div>
       </div>
     </div>
   </div>
@@ -67,6 +80,7 @@ export default defineComponent({
       accounts: [],
       contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
+      isRegistrationCompleted: store.getters.ElectorateStatus,
       showRegistry: false,
       totalRegisteredVoters: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,6 +121,10 @@ export default defineComponent({
         .then((totalRegVoters: any) => {
           this.totalRegisteredVoters = parseInt(totalRegVoters.toString());
           store.dispatch("storeRegisteredVoters", this.totalRegisteredVoters);
+          if (this.totalRegisteredVoters > 0) {
+            store.dispatch("storeElectorateStatus", true);
+            this.isRegistrationCompleted = store.getters.ElectorateStatus;
+          }
         })
         .then(() => {
           this.accounts = store.getters.Accounts;
@@ -119,7 +137,7 @@ export default defineComponent({
           let voter: Voter = {
             isEnrolled: result.isEnrolled,
             hasVoted: result.hasVoted,
-            indexProposal: parseInt(result.indexProposal.toString()),
+            choice: parseInt(result.choice.toString()),
             enrolledPollingStationID: parseInt(
               result.enrolledPollingStationID.toString()
             ),

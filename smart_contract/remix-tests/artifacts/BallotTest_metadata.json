@@ -1,0 +1,84 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "beforeAll",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "checkWinningProposal",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"remix-tests/Ballot_test.sol": "BallotTest"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/ballot.sol": {
+			"keccak256": "0x8b4f29ef65b5e402ef04ac0deec91c0e59278f83adb586fef6171e68ccc4a893",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://96d09caea4f31cbe2a8f3a298bfe3db5b108ef88ffeb453278eea61e3c386459",
+				"dweb:/ipfs/QmWcgKc9dJHP54xYRsSY1yvBAqDiHRykGLXQ1PPgJPNVH7"
+			]
+		},
+		"hardhat/console.sol": {
+			"keccak256": "0x72b6a1d297cd3b033d7c2e4a7e7864934bb767db6453623f1c3082c6534547f4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a8cb8681076e765c214e0d51cac989325f6b98e315eaae06ee0cbd5a9f084763",
+				"dweb:/ipfs/QmNWGHi4zmjxQTYN3NMGnJd49jBT5dE4bxTdWEaDuJrC6N"
+			]
+		},
+		"remix-tests/Ballot_test.sol": {
+			"keccak256": "0x14057a7d51c9031904be4f57601d7e38192975f1d79bd5ac62cbfe58cfd2293c",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://fb8f0ae25000f528de4c4c9a751f781ba7e2f252e45ff9f9d1a82692baa47d7e",
+				"dweb:/ipfs/QmTc8DBeccYNtq7fXhGmmkv337ogiYcMehr3oEYiPKPGs5"
+			]
+		},
+		"remix-tests/remix_tests.sol": {
+			"keccak256": "0xe2783cdc204cba8c72494119339f1d90f9022b15d6c718c668b7f097d8e29787",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://bb6a22e64c7f16bcaab63b1c1a1b269d5be8a6d37bdd9dec1718477ab916b18e",
+				"dweb:/ipfs/QmdkW1tT5iadBvaHMCoskhDGZKnfdg8o1D9CcoQYtdJet7"
+			]
+		}
+	},
+	"version": 1
+}

@@ -35,6 +35,11 @@
             </tr>
           </tbody>
         </table>
+        <article class="mt-4">
+          <div>
+            <h3>Number of Canditates: {{ numOfCandidates }}</h3>
+          </div>
+        </article>
       </div>
       <div class="container mt-5">
         <h4>Owner account: {{ currentAddress }}</h4>
@@ -56,29 +61,12 @@ export default defineComponent({
   name: "VotingComponent",
   data() {
     return {
-      showBallot: false,
-      selectedCandidate: "",
-      name: "",
       contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
+      numOfCandidates: 0,
+      showBallot: false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ballot: [] as any[],
-      columns: [
-        {
-          field: "id",
-          label: "ID",
-          width: "40",
-          numeric: true,
-        },
-        {
-          field: "name",
-          label: "Candidate Name",
-        },
-        {
-          field: "votes",
-          label: "Votes",
-        },
-      ],
     };
   },
   created() {
@@ -110,6 +98,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.candidatesCount().then((res: any) => {
         numOfCandidates = parseInt(res.toString());
+        this.numOfCandidates = numOfCandidates;
       });
 
       for (var i = 1; i <= numOfCandidates; i++) {
@@ -118,7 +107,7 @@ export default defineComponent({
           let candidate: Candidate = {
             id: parseInt(result.id.toString()),
             name: result.name,
-            votes: parseInt(result.voteCount.toString()),
+            votes: parseInt(result.votes.toString()),
           };
           this.ballot.push(candidate);
         });

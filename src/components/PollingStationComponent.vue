@@ -126,6 +126,7 @@ export default defineComponent({
       }
       store.dispatch("storePollingStations", this.pollingStationList);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.totalRegisteredVoters().then((result: any) => {
         store.dispatch("storeRegisteredVoters", parseInt(result.toString()));
       });
