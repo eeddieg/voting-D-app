@@ -1,18 +1,18 @@
 <template>
   <Metamask />
 
-  <ContractComponent />
+  <PollingStationComponent />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Metamask from "@/components/MetamaskComponent.vue";
-import ContractComponent from "@/components/ContractComponent.vue";
+import PollingStationComponent from "@/components/PollingStationComponent.vue";
 
 export default defineComponent({
-  name: "ContractView",
+  name: "PollingStationView",
   components: {
-    ContractComponent,
+    PollingStationComponent,
     Metamask,
   },
 });

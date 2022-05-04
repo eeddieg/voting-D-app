@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h3 class="p-3 text-center">Available accounts: {{ accounts.length }}</h3>
+    <h1 class="p-3 text-center">Available accounts: {{ accountsNumber }}</h1>
     <button
       class="btn btn-outline-primary"
       v-show="!accountsVisible"
@@ -49,17 +49,20 @@ import { ethers, utils } from "ethers";
 
 export default defineComponent({
   name: "AccountsComponent",
-  props: {
-    accounts: {
-      type: Array,
-    },
-  },
   data() {
     return {
       showTable: false,
       accountsVisible: false,
       tableVisible: false,
+      accounts: [],
       balances: [] as string[],
+    };
+  },
+  setup() {
+    const accountsNumber = store.getters.numberOfAccounts;
+
+    return {
+      accountsNumber,
     };
   },
   methods: {
@@ -68,10 +71,14 @@ export default defineComponent({
       this.tableVisible = !this.tableVisible;
       store.dispatch("toggleAccountsListVisibility", this.accountsVisible);
       store.dispatch("toggleTableVisibility", this.tableVisible);
+      if (this.accountsVisible) {
+        this.accounts = store.getters.Accounts;
+      }
+      this.accounts = store.getters.Accounts;
       this.getBalance();
     },
     async getBalance() {
-      let accountsList: any = null;
+      let accountsList: string[] = [];
       const provider = new ethers.providers.JsonRpcProvider();
       await provider.listAccounts().then((accounts) => {
         accountsList = accounts;

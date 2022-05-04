@@ -9,10 +9,57 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
+    path: "/accounts",
+    name: "accounts",
+    component: () =>
+      import(/* webpackChunkName: "accounts" */ "../views/AccountsView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/ballot",
+    name: "ballot",
+    component: () =>
+      import(/* webpackChunkName: "ballot" */ "../views/BallotView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/voters",
+    name: "voters",
+    component: () =>
+      import(/* webpackChunkName: "voters" */ "../views/VotersView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/pollingStations",
+    name: "pollingStations",
+    component: () =>
+      import(
+        /* webpackChunkName: "pollingStations" */ "../views/PollingStationView.vue"
+      ),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/contract",
     name: "contract",
     component: () =>
       import(/* webpackChunkName: "contract" */ "../views/ContractView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/voting",
+    name: "voting",
+    component: () =>
+      import(/* webpackChunkName: "voting" */ "../views/VotingView.vue"),
     meta: {
       requiresAuth: true,
     },
@@ -28,6 +75,11 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
     },
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: "404",
+    component: HomeView,
   },
 ];
 

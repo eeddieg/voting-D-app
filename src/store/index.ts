@@ -1,218 +1,38 @@
 import { createStore } from "vuex";
-import { ethers } from "ethers";
+import { State } from "./interfaces";
 
 export default createStore({
   state: {
     accounts: [],
     accountsListVisible: false,
+    ballot: [],
     contract: {},
+    contractAsSigner: {},
+    electorateStatus: false,
     logged: false,
+    numberOfAccounts: 0,
+    pollingStations: [],
     provider: null,
     tableVisible: false,
-    abi: [
-      {
-        inputs: [],
-        stateMutability: "nonpayable",
-        type: "constructor",
-      },
-      {
-        inputs: [
-          {
-            internalType: "address",
-            name: "_voterAddress",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "_pollingStationID",
-            type: "uint256",
-          },
-        ],
-        name: "addVoter",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "ballotOwner",
-        outputs: [
-          {
-            internalType: "address",
-            name: "",
-            type: "address",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "finalResult",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        name: "proposals",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "id",
-            type: "uint256",
-          },
-          {
-            internalType: "bytes32",
-            name: "name",
-            type: "bytes32",
-          },
-          {
-            internalType: "uint256",
-            name: "voteCount",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "startVote",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "state",
-        outputs: [
-          {
-            internalType: "enum Ballot.State",
-            name: "",
-            type: "uint8",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        name: "stations",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "stationID",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "pplEnrolled",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "votesCasted",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "totalVoters",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "totalVotes",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [
-          {
-            internalType: "address",
-            name: "",
-            type: "address",
-          },
-        ],
-        name: "voterRegister",
-        outputs: [
-          {
-            internalType: "bool",
-            name: "enrolled",
-            type: "bool",
-          },
-          {
-            internalType: "bool",
-            name: "voted",
-            type: "bool",
-          },
-          {
-            internalType: "int256",
-            name: "indexProposal",
-            type: "int256",
-          },
-          {
-            internalType: "uint256",
-            name: "enrolledPollingStationID",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "votedPollingStationID",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
+    registeredVoters: 0,
+    voterRegistry: [],
+    votingStatus: State.Created,
   },
   getters: {
-    abi(state) {
-      return state.abi as ethers.ContractInterface;
-    },
     Accounts(state) {
       return state.accounts;
     },
-    contract(state) {
+    Ballot(state) {
+      return state.ballot;
+    },
+    Contract(state) {
       return state.contract;
+    },
+    ContractAsSigner(state) {
+      return state.contractAsSigner;
+    },
+    ElectorateStatus(state) {
+      return state.electorateStatus;
     },
     isLogged(state) {
       return state.logged;
@@ -223,45 +43,108 @@ export default createStore({
     isTableVisible(state) {
       return state.tableVisible;
     },
+    numberOfAccounts(state) {
+      return state.numberOfAccounts;
+    },
+    PollingStations(state) {
+      return state.pollingStations;
+    },
     Provider(state) {
       return state.provider;
+    },
+    RegisteredVoters(state) {
+      return state.registeredVoters;
+    },
+    VoterRegistry(state) {
+      return state.voterRegistry;
+    },
+    VotingStatus(state) {
+      return state.votingStatus;
     },
   },
   mutations: {
     setAcounts(state, payload) {
       state.accounts = payload;
     },
-    setContract(state, payload) {
-      state.contract = payload;
-    },
     setAcountsListVisibility(state, payload) {
       state.accountsListVisible = payload;
     },
-    setTableVisibility(state, payload) {
-      state.tableVisible = payload;
+    setBallot(state, payload) {
+      state.ballot = payload;
+    },
+    setContract(state, payload) {
+      state.contract = payload;
+    },
+    setContractAsSigner(state, payload) {
+      state.contractAsSigner = payload;
     },
     setConnectionStatus(state, payload) {
       state.logged = payload;
     },
+    setElectorateStatus(state, payload) {
+      state.electorateStatus = payload;
+    },
+    setNumberOfAccounts(state, payload) {
+      state.numberOfAccounts = payload;
+    },
+    setPollingStations(state, payload) {
+      state.pollingStations = payload;
+    },
     setProvider(state, payload) {
       state.provider = payload;
+    },
+    setRegisteredVoters(state, payload) {
+      state.registeredVoters = payload;
+    },
+    setTableVisibility(state, payload) {
+      state.tableVisible = payload;
+    },
+    setVoterRegistry(state, payload) {
+      state.voterRegistry = payload;
+    },
+    setVotingStatus(state, payload) {
+      state.votingStatus = payload;
     },
   },
   actions: {
     storeAccounts({ commit }, payload) {
       commit("setAcounts", payload);
     },
+    toggleAccountsListVisibility({ commit }, payload) {
+      commit("setAcountsListVisibility", payload);
+    },
+    storeBallot({ commit }, payload) {
+      commit("setBallot", payload);
+    },
+    toggleConnectionStatus({ commit }, payload) {
+      commit("setConnectionStatus", payload);
+    },
     storeContract({ commit }, payload) {
       commit("setContract", payload);
+    },
+    storeContractAsSigner({ commit }, payload) {
+      commit("setContractAsSigner", payload);
+    },
+    storeElectorateStatus({ commit }, payload) {
+      commit("setElectorateStatus", payload);
+    },
+    storeNumberOfAccounts({ commit }, payload) {
+      commit("setNumberOfAccounts", payload);
+    },
+    storePollingStations({ commit }, payload) {
+      commit("setPollingStations", payload);
     },
     storeProvider({ commit }, payload) {
       commit("setProvider", payload);
     },
-    toggleAccountsListVisibility({ commit }, payload) {
-      commit("setAcountsListVisibility", payload);
+    storeRegisteredVoters({ commit }, payload) {
+      commit("setRegisteredVoters", payload);
     },
-    toggleConnectionStatus({ commit }, payload) {
-      commit("setConnectionStatus", payload);
+    storeVoterRegistry({ commit }, payload) {
+      commit("setVoterRegistry", payload);
+    },
+    storeVotingStatus({ commit }, payload) {
+      commit("setVotingStatus", payload);
     },
     toggleTableVisibility({ commit }, payload) {
       commit("setTableVisibility", payload);

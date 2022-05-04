@@ -23,17 +23,13 @@
       </form>
     </div>
   </nav>
-
-  <div class="container" v-if="isLogged">
-    <AccountsComponent :accounts="accounts" />
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import AccountsComponent from "@/components/AccountsComponent.vue";
 import NavBar from "@/components/NavBar.vue";
 import store from "@/store";
+import router from "@/router";
 import { ethers } from "ethers";
 
 declare let window: any;
@@ -45,12 +41,12 @@ export default defineComponent({
     msg: String,
   },
   components: {
-    AccountsComponent,
     NavBar,
   },
   data() {
     return {
-      accounts: [],
+      accounts: [] as string[],
+      accountsNumber: 0,
       isLogged: store.getters.isLogged,
     };
   },
@@ -66,15 +62,21 @@ export default defineComponent({
       console.log("Logged in.");
       store.dispatch("toggleConnectionStatus", true);
       this.isLogged = true;
-      store.dispatch("storeAccounts", await provider.listAccounts());
-      this.accounts = store.getters.Accounts;
+      this.accounts = await provider.listAccounts();
+      store.dispatch("storeAccounts", this.accounts);
+      store.dispatch("storeNumberOfAccounts", this.accounts.length);
+      this.accountsNumber = await store.getters.numberOfAccounts;
+      router.push("accounts");
     },
     async logout() {
       console.log("Logged out.");
       this.isLogged = false;
       store.dispatch("toggleConnectionStatus", false);
       store.dispatch("storeProvider", null);
+      store.dispatch("storeNumberOfAccounts", 0);
       this.accounts = [];
+      this.accountsNumber = 0;
+      router.push("/");
     },
   },
 });

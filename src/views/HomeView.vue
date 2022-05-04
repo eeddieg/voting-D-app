@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <MetamaskComponent></MetamaskComponent>
+    <MetamaskComponent />
   </div>
 </template>
 
