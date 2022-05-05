@@ -2,9 +2,9 @@
   <div class="container">
     <h1>Cast Vote</h1>
   </div>
-  <div class="container mt-3">
+  <div class="container mt-3" v-show="isVisible">
     <button class="btn btn-outline-primary" @click="castVote">
-      Intialize Electorate
+      Start Voting
     </button>
   </div>
 </template>
@@ -13,7 +13,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
 import ContractAddress from "@/store/contractAddress";
 import { State } from "@/store/interfaces";
 
@@ -21,10 +20,11 @@ export default defineComponent({
   name: "CastVoteComponent",
   data() {
     return {
+      ABI: store.getters.ABI,
       accounts: [],
       contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
-      isVisible: false,
+      isVisible: true,
       votingStatus: State.Created,
       totalRegisteredVoters: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +45,11 @@ export default defineComponent({
       const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner(this.currentAddress);
 
-      const Contract = await new ethers.Contract(ContractAddress, ABI, signer);
+      const Contract = await new ethers.Contract(
+        ContractAddress,
+        this.ABI,
+        signer
+      );
       store.dispatch("storeContractAsSigner", Contract);
     },
     async fetchVotingStatus() {
@@ -61,15 +65,22 @@ export default defineComponent({
     async castVote() {
       this.isVisible = false;
 
-      console.log(store.getters.Bytecode);
+      const contract = store.getters.Contract;
+      const accounts = store.getters.Accounts;
 
-      //   const contract = store.getters.ContractAsSigner;
-
-      //   await contract.startVote().then((res: any) => {
-      //     // console.log(res);
-      //   });
-      //   store.dispatch("storeVotingStatus", State.Voting);
-      //   console.log(store.getters.VotingStatus);
+      for (let account of accounts) {
+        let candidateChoice = this.getRandomIntInclusive(1, 5);
+        let pollingStation = this.getRandomIntInclusive(1, 10);
+        await contract
+          .castVote(candidateChoice, pollingStation)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((res: any) => {
+            // console.log(res);
+          });
+      }
+    },
+    getRandomIntInclusive(min: number, max: number) {
+      return Math.floor(Math.random() * (max - min + 1) + min);
     },
   },
 });

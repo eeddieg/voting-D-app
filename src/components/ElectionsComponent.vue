@@ -13,7 +13,7 @@
     <div class="container mt-3" v-show="!isVisible">
       <h4>Voting procedure has started!</h4>
     </div>
-    <div class="container mt-5">
+    <div class="container mt-5" v-show="!isVisible">
       <CastVoteComponent />
     </div>
   </div>
@@ -65,6 +65,7 @@ export default defineComponent({
     async fetchVotingStatus() {
       const contract = store.getters.ContractAsSigner;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.state().then((res: any) => {
         if (res == State.Created) {
           this.isVisible = true;
@@ -75,6 +76,7 @@ export default defineComponent({
       this.isVisible = false;
       const contract = store.getters.ContractAsSigner;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.startVote().then((res: any) => {
         // console.log(res);
       });

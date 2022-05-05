@@ -53,7 +53,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
 import ContractAddress from "@/store/contractAddress";
 import { Candidate } from "@/store/interfaces";
 
@@ -61,6 +60,7 @@ export default defineComponent({
   name: "VotingComponent",
   data() {
     return {
+      ABI: store.getters.ABI,
       contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
       numOfCandidates: 0,
@@ -86,7 +86,7 @@ export default defineComponent({
 
       const electionContract = await new ethers.Contract(
         ContractAddress,
-        ABI,
+        this.ABI,
         provider
       );
       store.dispatch("storeContract", electionContract);

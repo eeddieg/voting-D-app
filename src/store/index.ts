@@ -9,6 +9,7 @@ export default createStore({
     ballot: [],
     bytecode: {},
     contract: {},
+    contractAddress: "",
     contractAsSigner: {},
     electorateStatus: false,
     logged: false,
@@ -35,6 +36,9 @@ export default createStore({
     },
     Contract(state) {
       return state.contract;
+    },
+    ContractAddress(state) {
+      return state.contractAddress;
     },
     ContractAsSigner(state) {
       return state.contractAsSigner;
@@ -89,6 +93,9 @@ export default createStore({
     setContract(state, payload) {
       state.contract = payload;
     },
+    setContractAddress(state, payload) {
+      state.contractAddress = payload;
+    },
     setContractAsSigner(state, payload) {
       state.contractAsSigner = payload;
     },
@@ -141,6 +148,9 @@ export default createStore({
     },
     storeContract({ commit }, payload) {
       commit("setContract", payload);
+    },
+    storeContractAddress({ commit }, payload) {
+      commit("setContractAddress", payload);
     },
     storeContractAsSigner({ commit }, payload) {
       commit("setContractAsSigner", payload);
