@@ -9,7 +9,6 @@
 import { defineComponent } from "vue";
 import AccountsComponent from "@/components/AccountsComponent.vue"; // @ is an alias to /src
 import Metamask from "@/components/MetamaskComponent.vue";
-import NavBar from "@/components/NavBar.vue"; // @ is an alias to /src
 import store from "@/store";
 
 export default defineComponent({

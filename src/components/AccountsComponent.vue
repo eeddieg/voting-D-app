@@ -69,11 +69,13 @@ export default defineComponent({
     toggleAccounts() {
       this.accountsVisible = !this.accountsVisible;
       this.tableVisible = !this.tableVisible;
+
       store.dispatch("toggleAccountsListVisibility", this.accountsVisible);
       store.dispatch("toggleTableVisibility", this.tableVisible);
-      if (this.accountsVisible) {
-        this.accounts = store.getters.Accounts;
-      }
+
+      // if (this.accountsVisible) {
+      //   this.accounts = store.getters.Accounts;
+      // }
       this.accounts = store.getters.Accounts;
       this.getBalance();
     },

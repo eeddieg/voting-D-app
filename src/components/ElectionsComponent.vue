@@ -23,8 +23,7 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 import { State } from "@/store/interfaces";
 import CastVoteComponent from "@/components/CastVoteComponent.vue";
 
@@ -35,8 +34,9 @@ export default defineComponent({
   },
   data() {
     return {
+      ABI: store.getters.ABI,
       accounts: [],
-      contractAddress: "",
+      contractAddress: new ContractInfo().getContractAddress(),
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVisible: false,
       votingStatus: State.Created,
@@ -46,7 +46,6 @@ export default defineComponent({
     };
   },
   created() {
-    this.contractAddress = ContractAddress;
     this.currentAddress = store.getters.Accounts[0];
     this.init();
   },
@@ -59,7 +58,11 @@ export default defineComponent({
       const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner(this.currentAddress);
 
-      const Contract = await new ethers.Contract(ContractAddress, ABI, signer);
+      const Contract = await new ethers.Contract(
+        this.contractAddress,
+        this.ABI,
+        signer
+      );
       store.dispatch("storeContractAsSigner", Contract);
     },
     async fetchVotingStatus() {
@@ -76,12 +79,9 @@ export default defineComponent({
       this.isVisible = false;
       const contract = store.getters.ContractAsSigner;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.startVote().then((res: any) => {
-        // console.log(res);
-      });
+      await contract.startVote().then();
+
       store.dispatch("storeVotingStatus", State.Voting);
-      console.log(store.getters.VotingStatus);
     },
   },
 });

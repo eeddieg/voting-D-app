@@ -51,6 +51,8 @@ contract Election {
         _;
     }
 
+    // event VoteCasted(uint _choice);
+
     constructor() {
         electionOwner = msg.sender;
 
@@ -154,10 +156,11 @@ contract Election {
         state = State.Voting;
     }
 
-    function castVote(uint _choice, uint _pollingStationID) public inState(State.Voting) returns (bool voted){
-      
+    function castVote(uint _choice, uint _pollingStationID) public inState(State.Voting) returns (bool voted) {
+
         bool found = false;
 
+        // if (voterRegistry[_voterAddress].isEnrolled && !voterRegistry[_voterAddress].hasVoted) {
         if (voterRegistry[msg.sender].isEnrolled && !voterRegistry[msg.sender].hasVoted) {
 
             voterRegistry[msg.sender].choice = _choice;
@@ -170,28 +173,14 @@ contract Election {
 
             totalVotes++;
             found = true;
+
+            // emit VoteCasted(_choice);
         }
-
-        // if (bytes(voterRegister[msg.sender].voterName).length != 0 
-        // && !voterRegister[msg.sender].voted) {
-        //     voterRegister[msg.sender].voted = true;
-        //     vote memory v;
-        //     v.voterAddress = msg.sender;
-        //     v.choice = _choice;
-
-        //     if (_choice) {
-        //         countResult++;
-        //     }
-        //     votes[totalVote] = v;
-        //     totalVote++;
-        //     found = true;
-        // }
-
         return found;
     }
 
-    // function endVote() public inState(State.Voting) Owner { 
-    //     state = State.Ended;
-    //     finalResult = countResult;
-    // }
+    function endVote() public inState(State.Voting) Owner { 
+        state = State.Ended;
+        finalResult = countResult;
+    }
 }

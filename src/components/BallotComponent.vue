@@ -41,10 +41,6 @@
           </div>
         </article>
       </div>
-      <div class="container mt-5">
-        <h4>Owner account: {{ currentAddress }}</h4>
-        <h4>Contract address: {{ contractAddress }}</h4>
-      </div>
     </div>
   </div>
 </template>
@@ -53,7 +49,7 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 import { Candidate } from "@/store/interfaces";
 
 export default defineComponent({
@@ -61,7 +57,7 @@ export default defineComponent({
   data() {
     return {
       ABI: store.getters.ABI,
-      contractAddress: "",
+      contractAddress: new ContractInfo().getContractAddress(),
       currentAddress: "No Address provided, check your MetaMask Wallet",
       numOfCandidates: 0,
       showBallot: false,
@@ -73,7 +69,6 @@ export default defineComponent({
     this.init();
   },
   mounted() {
-    this.contractAddress = ContractAddress;
     this.currentAddress = store.getters.Accounts[0];
   },
   methods: {
@@ -85,7 +80,7 @@ export default defineComponent({
       const provider = new ethers.providers.JsonRpcProvider();
 
       const electionContract = await new ethers.Contract(
-        ContractAddress,
+        this.contractAddress,
         this.ABI,
         provider
       );

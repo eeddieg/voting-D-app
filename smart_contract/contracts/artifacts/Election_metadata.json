@@ -109,6 +109,13 @@
 			},
 			{
 				"inputs": [],
+				"name": "endVote",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "finalResult",
 				"outputs": [
 					{
@@ -308,11 +315,11 @@
 	},
 	"sources": {
 		"contracts/ergasia.sol": {
-			"keccak256": "0xe8f8647a6969bcb1db5fb6bdd55e55f700268c562165b005cf69709e7222e34e",
+			"keccak256": "0xc2e665862405194b91dec0ae8aa04d425871e1fbfeacb90aea9f4d13e1bdb893",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://56b7a17d016b8a2e94f8564915d76ff447628403aad0bf93f44f8b0b2318aa04",
-				"dweb:/ipfs/QmVS7P74N667JAsDMXay7TsVmn6q3X4kWrGLHGSv5yvB7w"
+				"bzz-raw://66c23b8e6ce7c965dc896d87135a12603c08c994a3b30c92b825cd965907d332",
+				"dweb:/ipfs/QmZFDpAhzUGUGtAWxitJ8mqfoZh2yZJnaYxz166f6Xa5p6"
 			]
 		}
 	},

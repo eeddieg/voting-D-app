@@ -32,20 +32,20 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import store from "@/store";
-import ABI from "@/store/abi";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 
 export default defineComponent({
   name: "ContractComponent",
+  data() {
+    return {
+      abi: store.getters.ABI,
+      contractAddress: new ContractInfo().getContractAddress(),
+    };
+  },
   setup() {
     const isLogged = store.getters.isLogged;
-    const contractAddress = ContractAddress;
-    const abi = ABI;
-
     return {
       isLogged,
-      contractAddress,
-      abi,
     };
   },
 });

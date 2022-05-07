@@ -64,16 +64,16 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 import { PollingStation } from "@/store/interfaces";
 
 export default defineComponent({
   name: "PollingStationComponent",
   data() {
     return {
+      ABI: store.getters.ABI,
       showPollingStation: false,
-      contractAddress: "",
+      contractAddress: new ContractInfo().getContractAddress(),
       currentAddress: "No Address provided, check your MetaMask Wallet",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pollingStationList: [] as any[],
@@ -84,7 +84,6 @@ export default defineComponent({
     this.init();
   },
   mounted() {
-    this.contractAddress = ContractAddress;
     this.currentAddress = store.getters.Accounts[0];
     this.totalRegisteredVoters = store.getters.RegisteredVoters;
   },
@@ -97,8 +96,8 @@ export default defineComponent({
       const provider = new ethers.providers.JsonRpcProvider();
 
       const contract = await new ethers.Contract(
-        ContractAddress,
-        ABI,
+        this.contractAddress,
+        this.ABI,
         provider
       );
       store.dispatch("storeContract", contract);

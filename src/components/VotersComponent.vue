@@ -56,10 +56,6 @@
             </div>
           </article>
         </div>
-        <div class="container mt-5">
-          <h4>Owner account: {{ currentAddress }}</h4>
-          <h4>Contract address: {{ contractAddress }}</h4>
-        </div>
       </div>
     </div>
   </div>
@@ -69,16 +65,16 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 import { Voter } from "@/store/interfaces";
 
 export default defineComponent({
   name: "VotingComponent",
   data() {
     return {
+      ABI: store.getters.ABI,
       accounts: [],
-      contractAddress: "",
+      contractAddress: new ContractInfo().getContractAddress(),
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isRegistrationCompleted: store.getters.ElectorateStatus,
       showRegistry: false,
@@ -91,7 +87,6 @@ export default defineComponent({
     this.init();
   },
   mounted() {
-    this.contractAddress = ContractAddress;
     this.currentAddress = store.getters.Accounts[0];
   },
   methods: {
@@ -105,8 +100,8 @@ export default defineComponent({
       const signer = provider.getSigner();
 
       const electionContract = await new ethers.Contract(
-        ContractAddress,
-        ABI,
+        this.contractAddress,
+        this.ABI,
         signer
       );
       store.dispatch("storeContractAsSigner", electionContract);

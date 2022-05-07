@@ -26,8 +26,7 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import ABI from "@/store/abi";
-import ContractAddress from "@/store/contractAddress";
+import { ContractInfo } from "@/store/contract";
 import ElectionsComponent from "./ElectionsComponent.vue";
 
 export default defineComponent({
@@ -37,30 +36,35 @@ export default defineComponent({
   },
   data() {
     return {
+      abi: store.getters.abi,
       accounts: [],
       contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
       ElectorateStatus: store.getters.ElectorateStatus,
-      totalRegisteredVoters: 0,
+      totalRegisteredVoters: store.getters.RegisteredVoters,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       voterRegister: [] as any[],
     };
   },
   created() {
-    this.contractAddress = ContractAddress;
+    this.contractAddress = new ContractInfo().getContractAddress();
     this.currentAddress = store.getters.Accounts[0];
     this.init();
   },
   methods: {
     async init() {
       await this.fetchContractAsSinger();
-      await this.checkElectorateStatus();
+      // await this.checkElectorateStatus();
     },
     async fetchContractAsSinger() {
       const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner(this.currentAddress);
 
-      const Contract = await new ethers.Contract(ContractAddress, ABI, signer);
+      const Contract = await new ethers.Contract(
+        this.contractAddress,
+        this.abi,
+        signer
+      );
       store.dispatch("storeContractAsSigner", Contract);
     },
     async initElectorate() {
@@ -87,6 +91,7 @@ export default defineComponent({
         });
         await store.dispatch("storeElectorateStatus", true);
         this.ElectorateStatus = true;
+        this.totalRegisteredVoters = store.getters.RegisteredVoters;
       }
     },
     async checkElectorateStatus() {

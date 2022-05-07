@@ -2,16 +2,11 @@
   <div class="container">
     <ElectorateComponent />
   </div>
-  <div class="container mt-5">
-    <h5>Owner account: {{ currentAddress }}</h5>
-    <h5>Contract address: {{ contractAddress }}</h5>
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import store from "@/store";
-import ContractAddress from "@/store/contractAddress";
 import ElectorateComponent from "./ElectorateComponent.vue";
 
 export default defineComponent({
@@ -21,12 +16,10 @@ export default defineComponent({
   },
   data() {
     return {
-      contractAddress: "",
       currentAddress: "No Address provided, check your MetaMask Wallet",
     };
   },
   created() {
-    this.contractAddress = ContractAddress;
     this.currentAddress = store.getters.Accounts[0];
   },
 });

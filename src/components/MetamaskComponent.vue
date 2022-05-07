@@ -32,6 +32,7 @@ import store from "@/store";
 import router from "@/router";
 import { ethers } from "ethers";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 // declare let web3Provider: any;
 
