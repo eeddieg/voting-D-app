@@ -13,7 +13,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import { State } from "@/store/interfaces";
 
 export default defineComponent({
@@ -22,7 +21,7 @@ export default defineComponent({
     return {
       ABI: store.getters.ABI,
       accounts: [],
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVisible: true,
       votingStatus: State.Created,
@@ -38,33 +37,16 @@ export default defineComponent({
   },
   methods: {
     async init() {
-      await this.fetchContract();
-      await this.fetchContractAsSinger();
       await this.fetchVotingStatus();
     },
-    async fetchContract() {
+    async fetchVotingStatus() {
       const provider = new ethers.providers.JsonRpcProvider();
 
-      const Contract = await new ethers.Contract(
+      const contract = await new ethers.Contract(
         this.contractAddress,
         this.ABI,
         provider
       );
-      store.dispatch("storeContract", Contract);
-    },
-    async fetchContractAsSinger() {
-      const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner(this.currentAddress);
-
-      const Contract = await new ethers.Contract(
-        this.contractAddress,
-        this.ABI,
-        signer
-      );
-      store.dispatch("storeContractAsSigner", Contract);
-    },
-    async fetchVotingStatus() {
-      const contract = store.getters.ContractAsSigner;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.state().then((res: any) => {
@@ -74,33 +56,69 @@ export default defineComponent({
       });
     },
     async castVote() {
-      this.isVisible = false;
+      const status = store.getters.VotingStatus;
 
-      const accounts = this.accounts;
+      if (status == State.Voting) {
+        this.isVisible = false;
 
-      const provider = new ethers.providers.JsonRpcProvider();
+        const accounts = this.accounts;
+        const provider = new ethers.providers.JsonRpcProvider();
 
-      for (let account of accounts) {
-        const signer = provider.getSigner(account);
+        for (let account of accounts) {
+          const signer = provider.getSigner(account);
 
-        const contractInstance = await new ethers.Contract(
-          this.contractAddress,
-          this.ABI,
-          signer
-        );
+          const contractInstance = await new ethers.Contract(
+            this.contractAddress,
+            this.ABI,
+            signer
+          );
 
-        let candidateChoice = this.getRandomIntInclusive(1, 5);
-        let pollingStation = this.getRandomIntInclusive(1, 10);
+          let candidateChoice = this.getRandomIntInclusive(1, 5);
+          let pollingStationID = this.getRandomIntInclusive(1, 10);
 
-        await contractInstance
-          .castVote(candidateChoice, pollingStation)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .then((res: any) => {
-            console.log(res);
-          });
+          await contractInstance
+            .castVote(candidateChoice, pollingStationID)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then((res: any) => {
+              console.log(res);
+            });
+        }
+      } else {
+        console.log("ERROR: Faulty voting status:", status);
+        this.fetchVotingStatus();
       }
 
-      this.endVoting(accounts.length);
+      // await contractInstance
+      //   .castVote(candidateChoice, pollingStationID)
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   .then((res: any) => {
+      //     console.log(res);
+      //   });
+      // await contractInstance.castVote(candidateChoice, pollingStationID).then();
+
+      // for (let account of accounts) {
+      //   const signer = provider.getSigner(account);
+
+      //   const contractInstance = await new ethers.Contract(
+      //     this.contractAddress,
+      //     this.ABI,
+      //     signer
+      //   );
+
+      //   let candidateChoice = this.getRandomIntInclusive(1, 5);
+      //   let pollingStationID = this.getRandomIntInclusive(1, 10);
+
+      //   await contractInstance.castVote(candidateChoice, pollingStationID);
+
+      // await contractInstance
+      //   .castVote(candidateChoice, pollingStation)
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   .then((res: any) => {
+      //     console.log(res);
+      //   });
+      // }
+
+      // this.endVoting(accounts.length);
     },
     getRandomIntInclusive(min: number, max: number) {
       return Math.floor(Math.random() * (max - min + 1) + min);
@@ -123,14 +141,15 @@ export default defineComponent({
     },
     async endVoting(size: number) {
       if (await this.checkVotersVoted(size)) {
-        const contract = store.getters.ContractAsSigner;
+        const contract = store.getters.ContractAsOwner;
+        console.log(contract);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await contract.endVote().then(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await contract.state().then((res: any) => {
-            console.log(res);
-          })
-        );
+        // await contract.endVote().then(
+        //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //   await contract.state().then((res: any) => {
+        //     console.log(res);
+        //   })
+        // );
       }
     },
   },

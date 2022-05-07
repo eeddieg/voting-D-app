@@ -23,7 +23,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import { State } from "@/store/interfaces";
 import CastVoteComponent from "@/components/CastVoteComponent.vue";
 
@@ -36,7 +35,7 @@ export default defineComponent({
     return {
       ABI: store.getters.ABI,
       accounts: [],
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVisible: false,
       votingStatus: State.Created,
@@ -51,25 +50,25 @@ export default defineComponent({
   },
   methods: {
     async init() {
-      await this.fetchContractAsSinger();
+      await this.fetchContractAsOwner();
       await this.fetchVotingStatus();
     },
-    async fetchContractAsSinger() {
+    async fetchContractAsOwner() {
       const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner(this.currentAddress);
+      const owner = provider.getSigner(this.currentAddress);
 
-      const Contract = await new ethers.Contract(
+      const Contract = new ethers.Contract(
         this.contractAddress,
         this.ABI,
-        signer
+        owner
       );
-      store.dispatch("storeContractAsSigner", Contract);
+      await store.dispatch("storeContractAsOwner", Contract);
     },
     async fetchVotingStatus() {
-      const contract = store.getters.ContractAsSigner;
+      const Contract = store.getters.ContractAsOwner;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.state().then((res: any) => {
+      await Contract.state().then((res: any) => {
         if (res == State.Created) {
           this.isVisible = true;
         }
@@ -77,9 +76,9 @@ export default defineComponent({
     },
     async startVoting() {
       this.isVisible = false;
-      const contract = store.getters.ContractAsSigner;
+      const Contract = store.getters.ContractAsOwner;
 
-      await contract.startVote().then();
+      await Contract.startVote().then();
 
       store.dispatch("storeVotingStatus", State.Voting);
     },

@@ -9,8 +9,8 @@ export default createStore({
     ballot: [],
     bytecode: {},
     contract: {},
+    contractAsOwner: {},
     contractAddress: "",
-    contractAsSigner: {},
     electorateStatus: false,
     logged: false,
     numberOfAccounts: 0,
@@ -37,11 +37,11 @@ export default createStore({
     Contract(state) {
       return state.contract;
     },
+    ContractAsOwner(state) {
+      return state.contractAsOwner;
+    },
     ContractAddress(state) {
       return state.contractAddress;
-    },
-    ContractAsSigner(state) {
-      return state.contractAsSigner;
     },
     ElectorateStatus(state) {
       return state.electorateStatus;
@@ -93,11 +93,11 @@ export default createStore({
     setContract(state, payload) {
       state.contract = payload;
     },
+    setContractAsOwner(state, payload) {
+      state.contractAsOwner = payload;
+    },
     setContractAddress(state, payload) {
       state.contractAddress = payload;
-    },
-    setContractAsSigner(state, payload) {
-      state.contractAsSigner = payload;
     },
     setConnectionStatus(state, payload) {
       state.logged = payload;
@@ -134,26 +134,20 @@ export default createStore({
     storeAccounts({ commit }, payload) {
       commit("setAcounts", payload);
     },
-    toggleAccountsListVisibility({ commit }, payload) {
-      commit("setAcountsListVisibility", payload);
-    },
     storeBallot({ commit }, payload) {
       commit("setBallot", payload);
     },
     storeBytecode({ commit }, payload) {
       commit("setBytecode", payload);
     },
-    toggleConnectionStatus({ commit }, payload) {
-      commit("setConnectionStatus", payload);
-    },
     storeContract({ commit }, payload) {
       commit("setContract", payload);
     },
+    storeContractAsOwner({ commit }, payload) {
+      commit("setContractAsOwner", payload);
+    },
     storeContractAddress({ commit }, payload) {
       commit("setContractAddress", payload);
-    },
-    storeContractAsSigner({ commit }, payload) {
-      commit("setContractAsSigner", payload);
     },
     storeElectorateStatus({ commit }, payload) {
       commit("setElectorateStatus", payload);
@@ -175,6 +169,12 @@ export default createStore({
     },
     storeVotingStatus({ commit }, payload) {
       commit("setVotingStatus", payload);
+    },
+    toggleAccountsListVisibility({ commit }, payload) {
+      commit("setAcountsListVisibility", payload);
+    },
+    toggleConnectionStatus({ commit }, payload) {
+      commit("setConnectionStatus", payload);
     },
     toggleTableVisibility({ commit }, payload) {
       commit("setTableVisibility", payload);

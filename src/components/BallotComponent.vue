@@ -49,15 +49,14 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import { Candidate } from "@/store/interfaces";
 
 export default defineComponent({
-  name: "VotingComponent",
+  name: "BallotComponent",
   data() {
     return {
       ABI: store.getters.ABI,
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       numOfCandidates: 0,
       showBallot: false,

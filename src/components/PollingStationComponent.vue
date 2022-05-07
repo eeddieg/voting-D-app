@@ -52,10 +52,6 @@
           </div>
         </article>
       </div>
-      <div class="container mt-5">
-        <h4>Owner account: {{ currentAddress }}</h4>
-        <h4>Contract address: {{ contractAddress }}</h4>
-      </div>
     </div>
   </div>
 </template>
@@ -64,7 +60,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import { PollingStation } from "@/store/interfaces";
 
 export default defineComponent({
@@ -73,7 +68,7 @@ export default defineComponent({
     return {
       ABI: store.getters.ABI,
       showPollingStation: false,
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pollingStationList: [] as any[],

@@ -65,7 +65,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import { Voter } from "@/store/interfaces";
 
 export default defineComponent({
@@ -74,7 +73,7 @@ export default defineComponent({
     return {
       ABI: store.getters.ABI,
       accounts: [],
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isRegistrationCompleted: store.getters.ElectorateStatus,
       showRegistry: false,
@@ -104,10 +103,10 @@ export default defineComponent({
         this.ABI,
         signer
       );
-      store.dispatch("storeContractAsSigner", electionContract);
+      store.dispatch("storeContract", electionContract);
     },
     async fetchVoterRegistry() {
-      const contract = await store.getters.ContractAsSigner;
+      const contract = await store.getters.Contract;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract

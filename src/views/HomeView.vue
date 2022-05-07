@@ -25,18 +25,23 @@ export default defineComponent({
     this.details = details;
   },
   mounted() {
+    // this.deployContract(privateKey, provider);
     this.fetchABI();
     this.fetchBytecode();
-    // this.deployContract(privateKey, provider);
+    this.fetchContractAddress();
   },
   methods: {
     async fetchABI() {
-      const ABI = this.details.getAbi();
-      await store.dispatch("storeABI", ABI);
+      await store.dispatch("storeABI", this.details.getAbi());
     },
     async fetchBytecode() {
-      const Bytecode = this.details.getBytecode();
-      await store.dispatch("storeBytecode", Bytecode);
+      await store.dispatch("storeBytecode", this.details.getBytecode());
+    },
+    async fetchContractAddress() {
+      await store.dispatch(
+        "storeContractAddress",
+        this.details.getContractAddress()
+      );
     },
   },
 });

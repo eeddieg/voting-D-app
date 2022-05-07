@@ -150,7 +150,6 @@ contract Election {
 
     /*
     * @dev Voting process begins. Can only be called by 'owner' when ballot has been created.
-    * @param -
     */
     function startVote() public inState(State.Created) Owner {
         state = State.Voting;
@@ -160,7 +159,6 @@ contract Election {
 
         bool found = false;
 
-        // if (voterRegistry[_voterAddress].isEnrolled && !voterRegistry[_voterAddress].hasVoted) {
         if (voterRegistry[msg.sender].isEnrolled && !voterRegistry[msg.sender].hasVoted) {
 
             voterRegistry[msg.sender].choice = _choice;

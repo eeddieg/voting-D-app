@@ -32,14 +32,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 
 export default defineComponent({
   name: "ContractComponent",
   data() {
     return {
       abi: store.getters.ABI,
-      contractAddress: new ContractInfo().getContractAddress(),
+      contractAddress: store.getters.ContractAddress,
     };
   },
   setup() {

@@ -37,10 +37,7 @@ declare let window: any;
 // declare let web3Provider: any;
 
 export default defineComponent({
-  name: "MetaMask",
-  props: {
-    msg: String,
-  },
+  name: "MetamaskComponent",
   components: {
     NavBar,
   },

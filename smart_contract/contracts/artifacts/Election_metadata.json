@@ -315,11 +315,11 @@
 	},
 	"sources": {
 		"contracts/ergasia.sol": {
-			"keccak256": "0xc2e665862405194b91dec0ae8aa04d425871e1fbfeacb90aea9f4d13e1bdb893",
+			"keccak256": "0x6332bc66e37f2d0e15e6fc2bbbf50e28370e751b3ec033e8310d05a0ce96e249",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://66c23b8e6ce7c965dc896d87135a12603c08c994a3b30c92b825cd965907d332",
-				"dweb:/ipfs/QmZFDpAhzUGUGtAWxitJ8mqfoZh2yZJnaYxz166f6Xa5p6"
+				"bzz-raw://107ea7fe5ec267cadcf3f1d984d8c0abea6289fb10bcc5a14097f7c1c87e88fa",
+				"dweb:/ipfs/Qma22yZnoi6x8DNYHiDMjtzFN6yvZk6pAWoZjr6uCvbH5z"
 			]
 		}
 	},

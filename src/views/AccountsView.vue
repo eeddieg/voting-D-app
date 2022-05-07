@@ -1,5 +1,5 @@
 <template>
-  <Metamask />
+  <MetamaskComponent />
   <div class="container" v-if="isLogged">
     <AccountsComponent :accountsNumber="accountsNumber" />
   </div>
@@ -8,19 +8,19 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import AccountsComponent from "@/components/AccountsComponent.vue"; // @ is an alias to /src
-import Metamask from "@/components/MetamaskComponent.vue";
+import MetamaskComponent from "@/components/MetamaskComponent.vue";
 import store from "@/store";
 
 export default defineComponent({
-  name: "HomeView",
+  name: "AccountsView",
   components: {
     AccountsComponent,
-    Metamask,
+    MetamaskComponent,
   },
   data() {
     return {
       accounts: [] as string[],
-      accountsNumber: 0,
+      accountsNumber: store.getters.numberOfAccounts,
       isLogged: store.getters.isLogged,
     };
   },

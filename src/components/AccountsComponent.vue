@@ -58,13 +58,7 @@ export default defineComponent({
       balances: [] as string[],
     };
   },
-  setup() {
-    const accountsNumber = store.getters.numberOfAccounts;
-
-    return {
-      accountsNumber,
-    };
-  },
+  props: ["accountsNumber"],
   methods: {
     toggleAccounts() {
       this.accountsVisible = !this.accountsVisible;
@@ -73,9 +67,6 @@ export default defineComponent({
       store.dispatch("toggleAccountsListVisibility", this.accountsVisible);
       store.dispatch("toggleTableVisibility", this.tableVisible);
 
-      // if (this.accountsVisible) {
-      //   this.accounts = store.getters.Accounts;
-      // }
       this.accounts = store.getters.Accounts;
       this.getBalance();
     },

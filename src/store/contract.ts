@@ -2,7 +2,7 @@ import store from "@/store";
 import { Wallet, ContractFactory } from "ethers";
 
 export class ContractInfo {
-  ContractAddress = "0x3848A78a63Be28E00EC3627F9E4db66FBE90AF2c";
+  ContractAddress = "0x9607DAC7f4aB321d188e14995A9b68c59066b0c9";
   ElectionJSON = require("../../smart_contract/contracts/artifacts/Election.json");
 
   getAbi() {

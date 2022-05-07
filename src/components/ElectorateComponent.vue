@@ -26,7 +26,6 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { ContractInfo } from "@/store/contract";
 import ElectionsComponent from "./ElectionsComponent.vue";
 
 export default defineComponent({
@@ -36,9 +35,9 @@ export default defineComponent({
   },
   data() {
     return {
-      abi: store.getters.abi,
+      abi: store.getters.ABI,
       accounts: [],
-      contractAddress: "",
+      contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       ElectorateStatus: store.getters.ElectorateStatus,
       totalRegisteredVoters: store.getters.RegisteredVoters,
@@ -47,28 +46,44 @@ export default defineComponent({
     };
   },
   created() {
-    this.contractAddress = new ContractInfo().getContractAddress();
     this.currentAddress = store.getters.Accounts[0];
     this.init();
   },
   methods: {
     async init() {
-      await this.fetchContractAsSinger();
-      // await this.checkElectorateStatus();
+      await this.fetchContractAsOwner();
+      await this.checkElectorateStatus();
     },
-    async fetchContractAsSinger() {
+    async fetchContractAsOwner() {
       const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner(this.currentAddress);
+      const owner = provider.getSigner(this.currentAddress);
 
-      const Contract = await new ethers.Contract(
+      const Contract = new ethers.Contract(
         this.contractAddress,
         this.abi,
-        signer
+        owner
       );
-      store.dispatch("storeContractAsSigner", Contract);
+
+      await store.dispatch("storeContractAsOwner", Contract);
+    },
+    async checkElectorateStatus() {
+      const contract = await store.getters.ContractAsOwner;
+
+      let voters = 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.totalRegisteredVoters().then((result: any) => {
+        voters = parseInt(result.toString());
+        store.dispatch("storeRegisteredVoters", voters);
+      });
+
+      if (voters > 0) {
+        await store.dispatch("storeElectorateStatus", true);
+        this.ElectorateStatus = true;
+        this.totalRegisteredVoters = voters;
+      }
     },
     async initElectorate() {
-      const contract = await store.getters.ContractAsSigner;
+      const contract = await store.getters.ContractAsOwner;
       this.accounts = await store.getters.Accounts;
       const accounts = this.accounts;
 
@@ -92,20 +107,6 @@ export default defineComponent({
         await store.dispatch("storeElectorateStatus", true);
         this.ElectorateStatus = true;
         this.totalRegisteredVoters = store.getters.RegisteredVoters;
-      }
-    },
-    async checkElectorateStatus() {
-      const contract = await store.getters.ContractAsSigner;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.totalRegisteredVoters().then((result: any) => {
-        this.totalRegisteredVoters = parseInt(result.toString());
-        store.dispatch("storeRegisteredVoters", this.totalRegisteredVoters);
-      });
-
-      if (this.totalRegisteredVoters > 0) {
-        await store.dispatch("storeElectorateStatus", true);
-        this.ElectorateStatus = true;
       }
     },
     getRandomIntInclusive() {
