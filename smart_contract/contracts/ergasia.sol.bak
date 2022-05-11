@@ -31,14 +31,13 @@ contract Election {
     uint public totalRegisteredVoters;
     uint private countResult;               // private variable for final results
     uint public finalResult;                // public variable for final results
-    Candidate[][] public results;
 
+         
     mapping(uint => Candidate) public candidates;   // list of candidates
     mapping(uint => PollingStation) public pollingStations;   // list of candidates
     mapping(address => Voter) public voterRegistry;
     mapping(address => bool) public voters;
-    mapping(uint => mapping(uint => Candidate)) public resultsPerPollingStation;
-    mapping(uint => Candidate[]) public resultsPerPollingStation1;
+    mapping(uint => mapping(uint => Candidate)) results;
     
     enum State { Created, Voting, Ended }
     State public state;
@@ -63,8 +62,6 @@ contract Election {
 
         //  Init number of polling stations
         initPollingStations();
-
-        // results = new Candidate[][](pollingStationCount);
 
         // set the phase of ballot
         state = State.Created;  
@@ -114,38 +111,6 @@ contract Election {
         pollingStationCount++;
         pollingStations[pollingStationCount] = PollingStation(pollingStationCount, _name, 0, 0);
     }
-
-    /** 
-    * @dev Helper method to initialize results per candidate per polling station
-    */
-    // function initResults() internal returns (Candidate[] memory){
-    //     Candidate[] memory res = new Candidate[](pollingStationCount);
-
-    //     for (uint i = 1; i <= pollingStationCount; i++) {
-    //         Candidate[] memory list = new Candidate[](candidatesCount);
-    //         for (uint j = 1; j <= candidatesCount; j++) {
-    //             list[j] = Candidate(j, "", 0);
-    //         }
-    //         res[i] = list;
-    //     }
-
-    //     return res;
-    // }
-
-    // function getResults() public view returns (uint[] memory) {
-    //     uint[] memory res = new uint[](pollingStationCount);
-
-    //     for (uint i = 1; i <= pollingStationCount; i++) {
-    //         Candidate[] memory list = new Candidate[](candidatesCount);
-    //         for (uint j = 1; j <= candidatesCount; j++) {
-    //             list[j] = results[i][j];
-    //         }
-    //         res[i] = list;
-    //     }
-
-    //     return res;
-    // }
-
 
     /** 
     * @dev Adds a voter to the voter registry. May only be called by 'owner'.
@@ -209,49 +174,13 @@ contract Election {
             found = true;
             voters[msg.sender] = found;
 
-            resultsPerPollingStation[_pollingStationID][_choice].votes++;
-
             emit VoteCasted(found, _choice, _pollingStationID);
         }
         return found;
     }
 
-    // function getResults() internal view returns (Candidate[][] memory) {
-    //     Candidate[][] memory res = new Candidate[][](pollingStationCount);
-
-    //     for (uint i = 1; i <= pollingStationCount; i++) {
-    //         Candidate[] memory list = new Candidate[](candidatesCount);
-    //         for (uint j = 1; j <= candidatesCount; j++) {
-    //             list[j] = resultsPerPollingStation[i][j];
-    //         }
-    //         res[i]= list;
-    //     }
-
-    //     return res;
-    // }
-
     function endVote() public inState(State.Voting) Owner { 
         state = State.Ended;
         finalResult = countResult;
-        Candidate[][] memory res = getResults();
-        results = res;
     }
-
-    function getResults() internal view returns (Candidate[][] memory) {
-        Candidate[][] memory res = new Candidate[][](pollingStationCount);
-
-        for (uint i = 1; i <= pollingStationCount; i++) {
-            Candidate[] memory list = new Candidate[](candidatesCount);
-            for (uint j = 1; j <= candidatesCount; j++) {
-                list[j] = resultsPerPollingStation[i][j];
-            }
-            res[i]= list;
-        }
-        return res;
-    }
-
-    function foo(uint _pollingStationID) public view returns (Candidate[] memory) {
-    return userOwnedTokens[addr];
-}
-
 }

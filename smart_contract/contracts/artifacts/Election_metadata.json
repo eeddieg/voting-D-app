@@ -11,6 +11,31 @@
 				"type": "constructor"
 			},
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "voted",
+						"type": "bool"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_choice",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_pollStationID",
+						"type": "uint256"
+					}
+				],
+				"name": "VoteCasted",
+				"type": "event"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -175,6 +200,74 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "results",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "votes",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "resultsPerPollingStation",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "votes",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "startVote",
 				"outputs": [],
@@ -197,19 +290,6 @@
 			{
 				"inputs": [],
 				"name": "totalRegisteredVoters",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "totalVotes",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -315,11 +395,11 @@
 	},
 	"sources": {
 		"contracts/ergasia.sol": {
-			"keccak256": "0x6332bc66e37f2d0e15e6fc2bbbf50e28370e751b3ec033e8310d05a0ce96e249",
+			"keccak256": "0x56168ad30cafccb15cc3e963e7d6345bbde5b669d53f0e771c0b2ff0b3bced33",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://107ea7fe5ec267cadcf3f1d984d8c0abea6289fb10bcc5a14097f7c1c87e88fa",
-				"dweb:/ipfs/Qma22yZnoi6x8DNYHiDMjtzFN6yvZk6pAWoZjr6uCvbH5z"
+				"bzz-raw://de6d7956df25c48b25eb9a6aeba15d45849d8090c92fb289717f684dbe3a415a",
+				"dweb:/ipfs/QmSiNusa37Pxin4bWjrjDyH9KuWyNiuMG83oa159N2SYWP"
 			]
 		}
 	},

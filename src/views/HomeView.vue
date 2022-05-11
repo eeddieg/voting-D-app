@@ -9,6 +9,7 @@ import { defineComponent } from "vue";
 import store from "@/store";
 import MetamaskComponent from "@/components/MetamaskComponent.vue"; // @ is an alias to /src
 import { ContractInfo } from "@/store/contract";
+import { ContractFactory } from "ethers";
 
 export default defineComponent({
   name: "HomeView",
@@ -28,6 +29,7 @@ export default defineComponent({
     // this.deployContract(privateKey, provider);
     this.fetchABI();
     this.fetchBytecode();
+    // this.deploySmartContract();
     this.fetchContractAddress();
   },
   methods: {
@@ -42,6 +44,13 @@ export default defineComponent({
         "storeContractAddress",
         this.details.getContractAddress()
       );
+    },
+    async deploySmartContract() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await new ContractInfo().deployContract().then(async () => {
+        const address = await store.getters.ContractAddress;
+        console.log(address);
+      });
     },
   },
 });

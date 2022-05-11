@@ -16,9 +16,11 @@ export default createStore({
     numberOfAccounts: 0,
     pollingStations: [],
     provider: null,
-    tableVisible: false,
     registeredVoters: 0,
+    results: 0,
+    tableVisible: false,
     voterRegistry: [],
+    votingCompleted: false,
     votingStatus: State.Created,
   },
   getters: {
@@ -67,8 +69,14 @@ export default createStore({
     RegisteredVoters(state) {
       return state.registeredVoters;
     },
+    Results(state) {
+      return state.results;
+    },
     VoterRegistry(state) {
       return state.voterRegistry;
+    },
+    VotingCompleted(state) {
+      return state.votingCompleted;
     },
     VotingStatus(state) {
       return state.votingStatus;
@@ -117,6 +125,9 @@ export default createStore({
     setRegisteredVoters(state, payload) {
       state.registeredVoters = payload;
     },
+    setResults(state, payload) {
+      state.results = payload;
+    },
     setTableVisibility(state, payload) {
       state.tableVisible = payload;
     },
@@ -125,6 +136,9 @@ export default createStore({
     },
     setVotingStatus(state, payload) {
       state.votingStatus = payload;
+    },
+    setVotingCompleted(state, payload) {
+      state.votingCompleted = payload;
     },
   },
   actions: {
@@ -164,8 +178,14 @@ export default createStore({
     storeRegisteredVoters({ commit }, payload) {
       commit("setRegisteredVoters", payload);
     },
+    storeResults({ commit }, payload) {
+      commit("setResults", payload);
+    },
     storeVoterRegistry({ commit }, payload) {
       commit("setVoterRegistry", payload);
+    },
+    storeVotingCompleted({ commit }, payload) {
+      commit("setVotingCompleted", payload);
     },
     storeVotingStatus({ commit }, payload) {
       commit("setVotingStatus", payload);

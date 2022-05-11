@@ -7,6 +7,24 @@
       Start Voting
     </button>
   </div>
+  <div class="container mt-3 text-success" v-show="isVotingCompleted">
+    <h3>Voting finished!</h3>
+    <h3>Check results</h3>
+    <button
+      class="btn btn-outline-primary"
+      @click="getResults"
+      v-show="!showResults"
+    >
+      Show Results
+    </button>
+    <button
+      class="btn btn-outline-primary"
+      @click="hideResults"
+      v-show="showResults"
+    >
+      Hide Results
+    </button>
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,11 +41,15 @@ export default defineComponent({
       accounts: [],
       contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
-      isVisible: true,
-      votingStatus: State.Created,
+      isVotingCompleted: store.getters.VotingCompleted,
+      isVisible: store.getters.VotingStatus == State.Voting ? true : false,
+      results: 0,
+      showResults: false,
       totalRegisteredVoters: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       voterRegister: [] as any[],
+      votersVoted: [] as boolean[],
+      votingStatus: store.getters.VotingStatus,
     };
   },
   created() {
@@ -37,7 +59,12 @@ export default defineComponent({
   },
   methods: {
     async init() {
-      await this.fetchVotingStatus();
+      const status = await this.fetchVotingStatus();
+      if (status == State.Ended) {
+        this.votingStatus = State.Ended;
+        this.isVotingCompleted = true;
+        this.getResults();
+      }
     },
     async fetchVotingStatus() {
       const provider = new ethers.providers.JsonRpcProvider();
@@ -48,17 +75,31 @@ export default defineComponent({
         provider
       );
 
+      let status;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.state().then((res: any) => {
-        if (res == State.Created) {
+      await contract.state().then((state: any) => {
+        store.dispatch("storeVotingStatus", state);
+        if (state == State.Created) {
+          status = state;
           this.isVisible = true;
+        } else if (state == State.Voting) {
+          status = state;
+          this.isVisible = false;
+          this.isVotingCompleted = false;
+          store.dispatch("storeVotingCompleted", false);
+        } else if (state == State.Ended) {
+          status = state;
+          this.isVotingCompleted = true;
+          store.dispatch("storeVotingCompleted", true);
         }
       });
+      return status;
     },
     async castVote() {
       const status = store.getters.VotingStatus;
 
       if (status == State.Voting) {
+        console.log("Voting Started");
         this.isVisible = false;
 
         const accounts = this.accounts;
@@ -76,81 +117,72 @@ export default defineComponent({
           let candidateChoice = this.getRandomIntInclusive(1, 5);
           let pollingStationID = this.getRandomIntInclusive(1, 10);
 
-          await contractInstance
-            .castVote(candidateChoice, pollingStationID)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .then((res: any) => {
-              console.log(res);
-            });
+          const tx = await contractInstance.castVote(
+            candidateChoice,
+            pollingStationID
+          );
+          const receipt = await tx.wait();
+
+          const events = receipt?.events;
+          const voted = events[0].args[0];
+          console.log(voted);
+          this.votersVoted.push(voted);
         }
+
+        await this.endVoting(accounts.length);
       } else {
         console.log("ERROR: Faulty voting status:", status);
-        this.fetchVotingStatus();
+        this.votingStatus = this.fetchVotingStatus();
       }
-
-      // await contractInstance
-      //   .castVote(candidateChoice, pollingStationID)
-      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   .then((res: any) => {
-      //     console.log(res);
-      //   });
-      // await contractInstance.castVote(candidateChoice, pollingStationID).then();
-
-      // for (let account of accounts) {
-      //   const signer = provider.getSigner(account);
-
-      //   const contractInstance = await new ethers.Contract(
-      //     this.contractAddress,
-      //     this.ABI,
-      //     signer
-      //   );
-
-      //   let candidateChoice = this.getRandomIntInclusive(1, 5);
-      //   let pollingStationID = this.getRandomIntInclusive(1, 10);
-
-      //   await contractInstance.castVote(candidateChoice, pollingStationID);
-
-      // await contractInstance
-      //   .castVote(candidateChoice, pollingStation)
-      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   .then((res: any) => {
-      //     console.log(res);
-      //   });
-      // }
-
-      // this.endVoting(accounts.length);
     },
     getRandomIntInclusive(min: number, max: number) {
       return Math.floor(Math.random() * (max - min + 1) + min);
     },
-    async checkVotersVoted(size: number) {
-      let totalVotes = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async endVoting(size: number) {
+      const voted = this.checkAllVoted();
 
+      if (voted) {
+        console.log("All voters voted.");
+
+        const contract = await store.getters.ContractAsOwner;
+
+        await contract.endVote().then(async () => {
+          await store.dispatch("storeVotingStatus", State.Ended);
+          this.votingStatus = State.Ended;
+          this.isVotingCompleted = true;
+        });
+      }
+    },
+    checkAllVoted() {
+      let voted = true;
+      for (let vote of this.votersVoted) {
+        if (vote == false) {
+          voted = false;
+        }
+      }
+      return voted;
+    },
+    async getResults() {
       const contract = await store.getters.Contract;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.totalVotes().then((res: any) => {
-        totalVotes = parseInt(res.toString());
+      await contract.finalResult().then((results: any) => {
+        const sum = parseInt(results.toString());
+        console.log("Results: ", sum);
+        store.dispatch("storeResults", sum);
+        this.results = sum;
       });
 
-      if (totalVotes == size) {
-        return true;
-      } else {
-        return false;
-      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.resultsPerPollingStation(1).then((res: any) => {
+        console.log(res);
+      });
+
+      this.showResults = true;
     },
-    async endVoting(size: number) {
-      if (await this.checkVotersVoted(size)) {
-        const contract = store.getters.ContractAsOwner;
-        console.log(contract);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // await contract.endVote().then(
-        //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //   await contract.state().then((res: any) => {
-        //     console.log(res);
-        //   })
-        // );
-      }
+    hideResults() {
+      this.showResults = false;
     },
   },
 });
