@@ -20,57 +20,12 @@
       class="row justify-content-center mt-3"
       v-show="tableVisible"
     >
-      <div class="col-auto">
-        <table class="table table-responsive table-striped w-auto">
-          <thead>
-            <tr>
-              <th>Account number</th>
-              <th>Account address</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr scope="row" v-for="(account, index) in accounts" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ account }}</td>
-              <td>{{ balances[index] }} ETH</td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- <nav aria-label="Page navigation example">
-          <ul class="pagination">
-            <li class="page-item">
-              <button
-                type="button"
-                class="page-link"
-                v-if="page != 1"
-                @click="page--"
-              >
-                Previous
-              </button>
-            </li>
-            <li class="page-item">
-              <button
-                type="button"
-                class="page-link"
-                v-for="pageNumber in pages.slice(page - 1, page + 5)"
-                @click="page = pageNumber"
-              >
-                {{ pageNumber }}
-              </button>
-            </li>
-            <li class="page-item">
-              <button
-                type="button"
-                @click="page++"
-                v-if="page < pages.length"
-                class="page-link"
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav> -->
+      <div class="container">
+        <AccountsTableComponent
+          :headers="headers"
+          :data="accounts"
+          :balances="balances"
+        />
       </div>
     </div>
   </div>
@@ -80,22 +35,43 @@
 import { defineComponent } from "vue";
 import store from "@/store";
 import { ethers, utils } from "ethers";
+import AccountsTableComponent from "./AccountsTableComponent.vue";
+import { ContractInfo } from "@/store/contract";
 
 export default defineComponent({
   name: "AccountsComponent",
+  components: { AccountsTableComponent },
   data() {
     return {
-      showTable: false,
+      accounts: [] as string[],
       accountsVisible: false,
-      tableVisible: false,
-      accounts: [],
       balances: [] as string[],
-      page: 1,
-      pages: [] as number[],
-      perPage: 9,
+      showTable: false,
+      tableVisible: false,
+      headers: [
+        {
+          key: "id",
+          value: "Account number",
+        },
+        {
+          key: "address",
+          value: "Account address",
+        },
+        {
+          key: "balance",
+          value: "Balance",
+        },
+      ],
     };
   },
   props: ["accountsNumber"],
+  mounted() {
+    const info = new ContractInfo();
+    info.getOwner();
+    info.getAccounts().then((res: string[]) => {
+      this.accounts = res;
+    });
+  },
   methods: {
     toggleAccounts() {
       this.accountsVisible = !this.accountsVisible;
@@ -104,15 +80,13 @@ export default defineComponent({
       store.dispatch("toggleAccountsListVisibility", this.accountsVisible);
       store.dispatch("toggleTableVisibility", this.tableVisible);
 
-      this.accounts = store.getters.Accounts;
       this.getBalance();
     },
     async getBalance() {
-      let accountsList: string[] = [];
+      const accountsList = store.getters.Accounts;
+
       const provider = new ethers.providers.JsonRpcProvider();
-      await provider.listAccounts().then((accounts) => {
-        accountsList = accounts;
-      });
+
       for (let accIndex in accountsList) {
         const index = +accIndex;
         const acc = accountsList[index];
@@ -122,27 +96,6 @@ export default defineComponent({
         });
       }
     },
-    // setPages () {
-    //   let numberOfPages = Math.ceil(this.posts.length / this.perPage);
-    //   for (let index = 1; index <= numberOfPages; index++) {
-    //     this.pages.push(index);
-    //   }
-    // },
-    // paginate (posts) {
-    //   let page = this.page;
-    //   let perPage = this.perPage;
-    //   let from = (page * perPage) - perPage;
-    //   let to = (page * perPage);
-    //   return  posts.slice(from, to);
-    // }
   },
-  // computed: {
-  //   displayedPosts () {
-  //     return this.paginate(this.posts);
-  //   }
-  // },
-  // },
 });
 </script>
-
-<style></style>

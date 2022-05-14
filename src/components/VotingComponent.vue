@@ -24,10 +24,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.helloworld {
-  margin: auto;
-  width: 50%;
-}
-</style>

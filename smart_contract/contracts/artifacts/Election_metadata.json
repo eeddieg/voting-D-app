@@ -153,6 +153,47 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_pStationID",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_candidateID",
+						"type": "uint256"
+					}
+				],
+				"name": "getResultsPerStationPerCandidate",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "id",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "name",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "votes",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Election.Candidate",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "pollingStationCount",
 				"outputs": [
@@ -193,74 +234,6 @@
 					{
 						"internalType": "uint256",
 						"name": "votesCasted",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "results",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "votes",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "resultsPerPollingStation",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "votes",
 						"type": "uint256"
 					}
 				],
@@ -395,11 +368,11 @@
 	},
 	"sources": {
 		"contracts/ergasia.sol": {
-			"keccak256": "0x56168ad30cafccb15cc3e963e7d6345bbde5b669d53f0e771c0b2ff0b3bced33",
+			"keccak256": "0xb7bcce4bea3b37349106fb8971c1e4d91c640004421411871fede73ae6464a51",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://de6d7956df25c48b25eb9a6aeba15d45849d8090c92fb289717f684dbe3a415a",
-				"dweb:/ipfs/QmSiNusa37Pxin4bWjrjDyH9KuWyNiuMG83oa159N2SYWP"
+				"bzz-raw://54ace47b15d9ce6006c7a85d537280f2906e93a85e986049a9a78bd9a6fbb393",
+				"dweb:/ipfs/QmNhpguhyns4C8LrrSTXFfZ4kVv5NjjuJBc8cvUeSo5s8S"
 			]
 		}
 	},

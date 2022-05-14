@@ -7,6 +7,22 @@
       Start Voting
     </button>
   </div>
+  <div class="container" v-show="loading">
+    <h3>Voters are voting. Please wait...</h3>
+  </div>
+  <div class="progress">
+    <div
+      class="progress-bar progress-bar-striped progress-bar-animated"
+      role="progressbar"
+      aria-valuenow="75"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      style="width: 95%"
+    ></div>
+  </div>
+  <div class="spinner-border" role="status" v-show="loading">
+    <span class="visually-hidden">Voting...</span>
+  </div>
   <div class="container mt-3 text-success" v-show="isVotingCompleted">
     <h3>Voting finished!</h3>
     <h3>Check results</h3>
@@ -43,6 +59,7 @@ export default defineComponent({
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVotingCompleted: store.getters.VotingCompleted,
       isVisible: store.getters.VotingStatus == State.Voting ? true : false,
+      loading: false,
       results: 0,
       showResults: false,
       totalRegisteredVoters: 0,
@@ -99,8 +116,8 @@ export default defineComponent({
       const status = store.getters.VotingStatus;
 
       if (status == State.Voting) {
-        console.log("Voting Started");
         this.isVisible = false;
+        this.loading = true;
 
         const accounts = this.accounts;
         const provider = new ethers.providers.JsonRpcProvider();
@@ -125,11 +142,11 @@ export default defineComponent({
 
           const events = receipt?.events;
           const voted = events[0].args[0];
-          console.log(voted);
           this.votersVoted.push(voted);
         }
 
         await this.endVoting(accounts.length);
+        this.loading = false;
       } else {
         console.log("ERROR: Faulty voting status:", status);
         this.votingStatus = this.fetchVotingStatus();
@@ -143,8 +160,6 @@ export default defineComponent({
       const voted = this.checkAllVoted();
 
       if (voted) {
-        console.log("All voters voted.");
-
         const contract = await store.getters.ContractAsOwner;
 
         await contract.endVote().then(async () => {
@@ -164,21 +179,60 @@ export default defineComponent({
       return voted;
     },
     async getResults() {
-      const contract = await store.getters.Contract;
+      const provider = new ethers.providers.JsonRpcProvider();
+
+      const contract = await new ethers.Contract(
+        this.contractAddress,
+        this.ABI,
+        provider
+      );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.finalResult().then((results: any) => {
         const sum = parseInt(results.toString());
-        console.log("Results: ", sum);
         store.dispatch("storeResults", sum);
         this.results = sum;
       });
 
+      let pollingStations = 0;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.resultsPerPollingStation(1).then((res: any) => {
-        console.log(res);
+      await contract.pollingStationCount().then((res: any) => {
+        pollingStations = parseInt(res.toString());
       });
 
+      let candidates = 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.candidatesCount().then((res: any) => {
+        candidates = parseInt(res.toString());
+      });
+
+      let outcome = new Array(pollingStations);
+
+      for (var i = 0; i < pollingStations; i++) {
+        let counter = 0;
+        let votesPerCandidate: number[] = new Array(candidates);
+
+        for (var j = 0; j < candidates; j++) {
+          await contract
+            .getResultsPerStationPerCandidate(i, j)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then((result: any) => {
+              const votesReceived = parseInt(result.votes.toString());
+              if (votesReceived > 0) {
+                counter += votesReceived;
+              }
+              votesPerCandidate[j] = votesReceived;
+            });
+        }
+        outcome[i] = {
+          stationID: i,
+          results: votesPerCandidate,
+          totalVotes: counter,
+        };
+      }
+
+      store.dispatch("storeVotingCompleted", true);
+      store.dispatch("storeResultsPerStation", outcome);
       this.showResults = true;
     },
     hideResults() {
@@ -187,10 +241,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.helloworld {
-  margin: auto;
-  width: 50%;
-}
-</style>

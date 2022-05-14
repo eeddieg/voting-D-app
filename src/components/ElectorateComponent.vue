@@ -2,7 +2,7 @@
   <div class="container">
     <h1 class="p-3 text-center">Elections</h1>
     <div class="container mt-3">
-      <article v-show="ElectorateStatus">
+      <article v-show="ElectorateStatus && !loading">
         <h4>
           Electorate is initiallized and counts
           {{ totalRegisteredVoters }} voters
@@ -15,10 +15,16 @@
       >
         Intialize Electorate
       </button>
+      <div class="container" v-show="loading">
+        <h3>Registering voters. Please wait...</h3>
+      </div>
+      <div class="spinner-border" role="status" v-show="loading">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
   </div>
   <div class="container mt-5">
-    <ElectionsComponent v-show="ElectorateStatus" />
+    <ElectionsComponent v-show="ElectorateStatus && !loading" />
   </div>
 </template>
 
@@ -40,6 +46,7 @@ export default defineComponent({
       contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       ElectorateStatus: store.getters.ElectorateStatus,
+      loading: false,
       totalRegisteredVoters: store.getters.RegisteredVoters,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       voterRegister: [] as any[],
@@ -83,6 +90,9 @@ export default defineComponent({
       }
     },
     async initElectorate() {
+      this.ElectorateStatus = true;
+      this.loading = true;
+
       const contract = await store.getters.ContractAsOwner;
       this.accounts = await store.getters.Accounts;
       const accounts = this.accounts;
@@ -105,8 +115,8 @@ export default defineComponent({
           store.dispatch("storeRegisteredVoters", parseInt(result.toString()));
         });
         await store.dispatch("storeElectorateStatus", true);
-        this.ElectorateStatus = true;
         this.totalRegisteredVoters = store.getters.RegisteredVoters;
+        this.loading = false;
       }
     },
     getRandomIntInclusive() {
@@ -117,10 +127,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.helloworld {
-  margin: auto;
-  width: 50%;
-}
-</style>

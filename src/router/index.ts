@@ -92,7 +92,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     const isLogged = store.getters.isLogged;
     if (!isLogged) {
-      next({ name: "Home" });
+      next({ name: "home" });
     } else {
       next();
     }

@@ -45,13 +45,10 @@
             </tr>
           </tbody>
         </table>
-        <article>
-          <div>
-            <h3>Number of Polling stations: {{ pollingStationList.length }}</h3>
-            <h3>Number of Voters Registered: {{ totalRegisteredVoters }}</h3>
-          </div>
-        </article>
       </div>
+    </div>
+    <div class="container mt-5" v-show="showPollingStation && votingCompleted">
+      <ResultsTableComponent />
     </div>
   </div>
 </template>
@@ -60,10 +57,13 @@
 import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
-import { PollingStation } from "@/store/interfaces";
+import { PollingStation, State } from "@/store/interfaces";
+import ResultsTableComponent from "./ResultsTableComponent.vue";
+import { stdin } from "process";
 
 export default defineComponent({
   name: "PollingStationComponent",
+  components: { ResultsTableComponent },
   data() {
     return {
       ABI: store.getters.ABI,
@@ -73,6 +73,8 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pollingStationList: [] as any[],
       totalRegisteredVoters: 0,
+      votingStatus: undefined,
+      votingCompleted: false,
     };
   },
   created() {
@@ -86,10 +88,10 @@ export default defineComponent({
     async init() {
       await this.fetchContract();
       await this.fetchPollingStations();
+      await this.checkStatus();
     },
     async fetchContract() {
       const provider = new ethers.providers.JsonRpcProvider();
-
       const contract = await new ethers.Contract(
         this.contractAddress,
         this.ABI,
@@ -99,13 +101,11 @@ export default defineComponent({
     },
     async fetchPollingStations() {
       const contract = await store.getters.Contract;
-
       let pollingStations = 0;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.pollingStationCount().then((res: any) => {
         pollingStations = parseInt(res.toString());
       });
-
       for (var i = 1; i <= pollingStations; i++) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await contract.pollingStations(i).then((result: any) => {
@@ -114,18 +114,36 @@ export default defineComponent({
             name: result.name,
             votersRegistered: parseInt(result.votersRegistered.toString()),
             votesCasted: parseInt(result.votesCasted.toString()),
+            scoresPerCandidate: [],
           };
           this.pollingStationList.push(station);
         });
       }
       store.dispatch("storePollingStations", this.pollingStationList);
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.totalRegisteredVoters().then((result: any) => {
         store.dispatch("storeRegisteredVoters", parseInt(result.toString()));
       });
     },
+    async checkStatus() {
+      const contract = await store.getters.Contract;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.state().then((state: any) => {
+        store.dispatch("storeVotingStatus", state);
+        this.votingStatus = state;
+        if (state == State.Ended) {
+          this.votingCompleted = true;
+          store.dispatch("storeVotingStatus", true);
+        }
+      });
+    },
     async displayPollingStation() {
+      this.votingStatus = await store.getters.VotingStatus;
+      if (this.votingStatus == State.Ended) {
+        this.votingCompleted = true;
+      }
+
       if (!this.showPollingStation) {
         this.pollingStationList = await store.getters.PollingStations;
         this.totalRegisteredVoters = await store.getters.RegisteredVoters;
@@ -135,10 +153,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.helloworld {
-  margin: auto;
-  width: 50%;
-}
-</style>

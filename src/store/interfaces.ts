@@ -9,6 +9,7 @@ interface PollingStation {
   name: string;
   votersRegistered: number;
   votesCasted: number;
+  scoresPerCandidate: Candidate[];
 }
 
 interface Voter {

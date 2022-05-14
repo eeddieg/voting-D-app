@@ -26,7 +26,6 @@ export default defineComponent({
     this.details = details;
   },
   mounted() {
-    // this.deployContract(privateKey, provider);
     this.fetchABI();
     this.fetchBytecode();
     // this.deploySmartContract();
@@ -45,13 +44,13 @@ export default defineComponent({
         this.details.getContractAddress()
       );
     },
-    async deploySmartContract() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await new ContractInfo().deployContract().then(async () => {
-        const address = await store.getters.ContractAddress;
-        console.log(address);
-      });
-    },
+    // async deploySmartContract() {
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   await new ContractInfo().deployContract().then(async () => {
+    //     const address = await store.getters.ContractAddress;
+    //     console.log(address);
+    //   });
+    // },
   },
 });
 </script>

@@ -14,10 +14,12 @@ export default createStore({
     electorateStatus: false,
     logged: false,
     numberOfAccounts: 0,
+    owner: "",
     pollingStations: [],
     provider: null,
     registeredVoters: 0,
     results: 0,
+    resultsPerStation: [],
     tableVisible: false,
     voterRegistry: [],
     votingCompleted: false,
@@ -59,6 +61,9 @@ export default createStore({
     },
     numberOfAccounts(state) {
       return state.numberOfAccounts;
+    },
+    Owner(state) {
+      return state.owner;
     },
     PollingStations(state) {
       return state.pollingStations;
@@ -119,6 +124,9 @@ export default createStore({
     setPollingStations(state, payload) {
       state.pollingStations = payload;
     },
+    setOwner(state, payload) {
+      state.owner = payload;
+    },
     setProvider(state, payload) {
       state.provider = payload;
     },
@@ -127,6 +135,9 @@ export default createStore({
     },
     setResults(state, payload) {
       state.results = payload;
+    },
+    setResultsPerStation(state, payload) {
+      state.resultsPerStation = payload;
     },
     setTableVisibility(state, payload) {
       state.tableVisible = payload;
@@ -169,6 +180,9 @@ export default createStore({
     storeNumberOfAccounts({ commit }, payload) {
       commit("setNumberOfAccounts", payload);
     },
+    storeOwner({ commit }, payload) {
+      commit("setOwner", payload);
+    },
     storePollingStations({ commit }, payload) {
       commit("setPollingStations", payload);
     },
@@ -180,6 +194,9 @@ export default createStore({
     },
     storeResults({ commit }, payload) {
       commit("setResults", payload);
+    },
+    storeResultsPerStation({ commit }, payload) {
+      commit("setResultsPerStation", payload);
     },
     storeVoterRegistry({ commit }, payload) {
       commit("setVoterRegistry", payload);

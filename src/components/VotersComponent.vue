@@ -24,38 +24,12 @@
           Hide Registry
         </button>
       </div>
-      <div
-        id="table"
-        class="row justify-content-center mt-5"
-        v-show="showRegistry"
-      >
-        <div class="col-auto">
-          <table class="table table-responsive table-striped w-auto">
-            <thead>
-              <tr>
-                <th scope="col">Voter Registered</th>
-                <th scope="col">Voter Voted</th>
-                <th scope="col">Vote</th>
-                <th scope="col">Registration P. Station ID</th>
-                <th scope="col">Vote P. Station ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr scope="row" v-for="voter in registry" :key="voter.id">
-                <td>{{ voter.isEnrolled ? "YES" : "NO" }}</td>
-                <td>{{ voter.hasVoted ? "YES" : "NO" }}</td>
-                <td>{{ voter.indexProposal }}</td>
-                <td>{{ voter.enrolledPollingStationID }}</td>
-                <td>{{ voter.votedPollingStationID }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <article>
-            <div>
-              <h3>Number of Voters Registered: {{ totalRegisteredVoters }}</h3>
-            </div>
-          </article>
-        </div>
+      <div class="container">
+        <VotersTableComponent
+          :headers="headers"
+          :data="registry"
+          v-show="showRegistry"
+        />
       </div>
     </div>
   </div>
@@ -66,9 +40,11 @@ import { defineComponent } from "vue";
 import { ethers } from "ethers";
 import store from "@/store";
 import { Voter } from "@/store/interfaces";
+import VotersTableComponent from "./VotersTableComponent.vue";
 
 export default defineComponent({
   name: "VotingComponent",
+  components: { VotersTableComponent },
   data() {
     return {
       ABI: store.getters.ABI,
@@ -80,6 +56,28 @@ export default defineComponent({
       totalRegisteredVoters: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       registry: [] as any[],
+      headers: [
+        {
+          key: "index",
+          value: "#",
+        },
+        {
+          key: "id",
+          value: "Voter Registered",
+        },
+        {
+          key: "voted",
+          value: "Voter Voted",
+        },
+        {
+          key: "registrationID",
+          value: "Registration Polling Station ID",
+        },
+        {
+          key: "pollingID",
+          value: "Vote Polling Station ID",
+        },
+      ],
     };
   },
   created() {
@@ -106,43 +104,46 @@ export default defineComponent({
       store.dispatch("storeContract", electionContract);
     },
     async fetchVoterRegistry() {
-      const contract = await store.getters.Contract;
+      this.registry = store.getters.VoterRegistry;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract
-        .totalRegisteredVoters()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then((totalRegVoters: any) => {
-          this.totalRegisteredVoters = parseInt(totalRegVoters.toString());
-          store.dispatch("storeRegisteredVoters", this.totalRegisteredVoters);
-          if (this.totalRegisteredVoters > 0) {
-            store.dispatch("storeElectorateStatus", true);
-            this.isRegistrationCompleted = store.getters.ElectorateStatus;
-          }
-        })
-        .then(() => {
-          this.accounts = store.getters.Accounts;
-        });
+      if (this.registry.length == 0) {
+        const contract = await store.getters.Contract;
 
-      for (let i = 0; i < this.totalRegisteredVoters; i++) {
-        let voterAddress = this.accounts[i];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await contract.voterRegistry(voterAddress).then((result: any) => {
-          let voter: Voter = {
-            isEnrolled: result.isEnrolled,
-            hasVoted: result.hasVoted,
-            choice: parseInt(result.choice.toString()),
-            enrolledPollingStationID: parseInt(
-              result.enrolledPollingStationID.toString()
-            ),
-            votedPollingStationID: parseInt(
-              result.votedPollingStationID.toString()
-            ),
-          };
-          this.registry.push(voter);
-        });
+        await contract
+          .totalRegisteredVoters()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((totalRegVoters: any) => {
+            this.totalRegisteredVoters = parseInt(totalRegVoters.toString());
+            store.dispatch("storeRegisteredVoters", this.totalRegisteredVoters);
+            if (this.totalRegisteredVoters > 0) {
+              store.dispatch("storeElectorateStatus", true);
+              this.isRegistrationCompleted = store.getters.ElectorateStatus;
+            }
+          })
+          .then(() => {
+            this.accounts = store.getters.Accounts;
+          });
+
+        for (let i = 0; i < this.totalRegisteredVoters; i++) {
+          let voterAddress = this.accounts[i];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await contract.voterRegistry(voterAddress).then((result: any) => {
+            let voter: Voter = {
+              isEnrolled: result.isEnrolled,
+              hasVoted: result.hasVoted,
+              choice: parseInt(result.choice.toString()),
+              enrolledPollingStationID: parseInt(
+                result.enrolledPollingStationID.toString()
+              ),
+              votedPollingStationID: parseInt(
+                result.votedPollingStationID.toString()
+              ),
+            };
+            this.registry.push(voter);
+          });
+        }
       }
-
       store.dispatch("storeVoterRegistry", this.registry);
     },
     async displayRegistry() {
@@ -156,10 +157,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.helloworld {
-  margin: auto;
-  width: 50%;
-}
-</style>
