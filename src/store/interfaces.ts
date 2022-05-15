@@ -22,6 +22,7 @@ interface Voter {
 
 enum State {
   Created,
+  Started,
   Voting,
   Ended,
 }

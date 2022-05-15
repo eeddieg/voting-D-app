@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "ganache": "ganache-cli -a 101 -m 'plastic engine pistol common buffalo decorate balcony bean festival arm rotate anchor'",
+    "remix": "remixd -s ~/Repo/vue/web3app/smart_contract --remix-ide https://remix.ethereum.org",
+    "ganache": "ganache-cli -a 100 -m 'broom cherry dice certain expect hazard advice afraid twice tonight vague snow'",
+    "dev": "concurrently --kill-others \"npm run remix\" \"npm run ganache\" \"npm run serve\"",
     "serve": "vue-cli-service serve --host localhost",
-    "dev": "concurrently --kill-others \"npm run ganache\" \"npm run serve\"",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },

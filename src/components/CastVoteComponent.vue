@@ -3,43 +3,33 @@
     <h1>Cast Vote</h1>
   </div>
   <div class="container mt-3" v-show="isVisible">
-    <button class="btn btn-outline-primary" @click="castVote">
+    <button class="btn btn-outline-primary" @click="startVoting">
       Start Voting
     </button>
   </div>
-  <div class="container" v-show="loading">
-    <h3>Voters are voting. Please wait...</h3>
-  </div>
-  <div class="progress">
-    <div
-      class="progress-bar progress-bar-striped progress-bar-animated"
-      role="progressbar"
-      aria-valuenow="75"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      style="width: 95%"
-    ></div>
-  </div>
-  <div class="spinner-border" role="status" v-show="loading">
-    <span class="visually-hidden">Voting...</span>
+  <div class="container" v-show="progressBarVisible">
+    <div class="container">
+      <h3>Voters are voting. Please wait...</h3>
+    </div>
+    <div class="container col-6">
+      <div class="progress">
+        <div
+          id="progress-bar"
+          class="progress-bar progress-bar-striped progress-bar-animated"
+          role="progressbar"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          style="width: 0%"
+        >
+          {{ votersVoted.length }}%
+        </div>
+      </div>
+    </div>
   </div>
   <div class="container mt-3 text-success" v-show="isVotingCompleted">
     <h3>Voting finished!</h3>
-    <h3>Check results</h3>
-    <button
-      class="btn btn-outline-primary"
-      @click="getResults"
-      v-show="!showResults"
-    >
-      Show Results
-    </button>
-    <button
-      class="btn btn-outline-primary"
-      @click="hideResults"
-      v-show="showResults"
-    >
-      Hide Results
-    </button>
+    <h4>Check results on other tabs</h4>
   </div>
 </template>
 
@@ -58,8 +48,9 @@ export default defineComponent({
       contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVotingCompleted: store.getters.VotingCompleted,
-      isVisible: store.getters.VotingStatus == State.Voting ? true : false,
+      isVisible: true,
       loading: false,
+      progressBarVisible: false,
       results: 0,
       showResults: false,
       totalRegisteredVoters: 0,
@@ -77,10 +68,11 @@ export default defineComponent({
   methods: {
     async init() {
       const status = await this.fetchVotingStatus();
+      this.totalRegisteredVoters = store.getters.VoterRegistry.length;
+      this.votingStatus = status;
       if (status == State.Ended) {
-        this.votingStatus = State.Ended;
         this.isVotingCompleted = true;
-        this.getResults();
+        // this.getResults();
       }
     },
     async fetchVotingStatus() {
@@ -96,21 +88,43 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await contract.state().then((state: any) => {
         store.dispatch("storeVotingStatus", state);
+        status = state;
         if (state == State.Created) {
-          status = state;
           this.isVisible = true;
-        } else if (state == State.Voting) {
-          status = state;
-          this.isVisible = false;
           this.isVotingCompleted = false;
+          this.votingStatus = State.Created;
           store.dispatch("storeVotingCompleted", false);
+          store.dispatch("storeVotingStatus", State.Created);
+        } else if (state == State.Started) {
+          this.isVisible = true;
+          this.isVotingCompleted = false;
+          this.votingStatus = State.Started;
+          store.dispatch("storeVotingCompleted", false);
+          store.dispatch("storeVotingStatus", State.Started);
+        } else if (state == State.Voting) {
+          this.isVisible = false;
+          this.votingStatus = State.Voting;
+          store.dispatch("storeVotingStatus", State.Voting);
         } else if (state == State.Ended) {
-          status = state;
+          this.isVisible = false;
+          this.votingStatus = State.Ended;
           this.isVotingCompleted = true;
           store.dispatch("storeVotingCompleted", true);
+          store.dispatch("storeVotingStatus", State.Ended);
         }
       });
       return status;
+    },
+    async startVoting() {
+      const Contract = store.getters.ContractAsOwner;
+
+      await Contract.startVoting()
+        .then(() => {
+          store.dispatch("storeVotingStatus", State.Voting);
+        })
+        .then(async () => {
+          await this.castVote();
+        });
     },
     async castVote() {
       const status = store.getters.VotingStatus;
@@ -118,6 +132,7 @@ export default defineComponent({
       if (status == State.Voting) {
         this.isVisible = false;
         this.loading = true;
+        this.progressBarVisible = true;
 
         const accounts = this.accounts;
         const provider = new ethers.providers.JsonRpcProvider();
@@ -143,10 +158,11 @@ export default defineComponent({
           const events = receipt?.events;
           const voted = events[0].args[0];
           this.votersVoted.push(voted);
+          this.updateProgressBar(this.votersVoted.length);
         }
-
-        await this.endVoting(accounts.length);
+        await this.endVoting();
         this.loading = false;
+        this.progressBarVisible = false;
       } else {
         console.log("ERROR: Faulty voting status:", status);
         this.votingStatus = this.fetchVotingStatus();
@@ -155,8 +171,15 @@ export default defineComponent({
     getRandomIntInclusive(min: number, max: number) {
       return Math.floor(Math.random() * (max - min + 1) + min);
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async endVoting(size: number) {
+    updateProgressBar(count: number) {
+      let bar = document.getElementById("progress-bar") as HTMLElement;
+
+      const width = ((count / 100) * 100).toFixed(0);
+      bar.ariaValueNow = width.toString();
+      const val = "width: " + width + "%";
+      bar.setAttribute("style", val);
+    },
+    async endVoting() {
       const voted = this.checkAllVoted();
 
       if (voted) {
@@ -178,66 +201,73 @@ export default defineComponent({
       }
       return voted;
     },
-    async getResults() {
-      const provider = new ethers.providers.JsonRpcProvider();
+    // async getResults() {
+    //   const provider = new ethers.providers.JsonRpcProvider();
 
-      const contract = await new ethers.Contract(
-        this.contractAddress,
-        this.ABI,
-        provider
-      );
+    //   const contract = await new ethers.Contract(
+    //     this.contractAddress,
+    //     this.ABI,
+    //     provider
+    //   );
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.finalResult().then((results: any) => {
-        const sum = parseInt(results.toString());
-        store.dispatch("storeResults", sum);
-        this.results = sum;
-      });
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   await contract.finalResult().then((results: any) => {
+    //     const sum = parseInt(results.toString());
+    //     store.dispatch("storeResults", sum);
+    //     this.results = sum;
+    //   });
 
-      let pollingStations = 0;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.pollingStationCount().then((res: any) => {
-        pollingStations = parseInt(res.toString());
-      });
+    //   let pollingStations = 0;
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   await contract.pollingStationCount().then((res: any) => {
+    //     pollingStations = parseInt(res.toString());
+    //   });
 
-      let candidates = 0;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await contract.candidatesCount().then((res: any) => {
-        candidates = parseInt(res.toString());
-      });
+    //   let candidates = 0;
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   await contract.candidatesCount().then((res: any) => {
+    //     candidates = parseInt(res.toString());
+    //   });
 
-      let outcome = new Array(pollingStations);
+    //   let outcome = new Array(pollingStations + 1);
 
-      for (var i = 0; i < pollingStations; i++) {
-        let counter = 0;
-        let votesPerCandidate: number[] = new Array(candidates);
+    //   for (var i = 1; i <= pollingStations; i++) {
+    //     let counter = 0;
+    //     let votesPerCandidate: number[] = new Array(candidates + 1);
 
-        for (var j = 0; j < candidates; j++) {
-          await contract
-            .getResultsPerStationPerCandidate(i, j)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .then((result: any) => {
-              const votesReceived = parseInt(result.votes.toString());
-              if (votesReceived > 0) {
-                counter += votesReceived;
-              }
-              votesPerCandidate[j] = votesReceived;
-            });
-        }
-        outcome[i] = {
-          stationID: i,
-          results: votesPerCandidate,
-          totalVotes: counter,
-        };
-      }
+    //     for (var j = 1; j <= candidates; j++) {
+    //       await contract
+    //         .getResultsPerStationPerCandidate(i, j)
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         .then((result: any) => {
+    //           if (j == 0) {
+    //             console.log(result);
+    //           }
+    //           const votesReceived = parseInt(result.votes.toString());
+    //           if (votesReceived > 0) {
+    //             counter += votesReceived;
+    //           }
+    //           votesPerCandidate[j] = votesReceived;
+    //         });
+    //     }
+    //     outcome[i] = {
+    //       stationID: i + 1,
+    //       results: votesPerCandidate,
+    //       totalVotes: counter,
+    //     };
+    //   }
 
-      store.dispatch("storeVotingCompleted", true);
-      store.dispatch("storeResultsPerStation", outcome);
-      this.showResults = true;
-    },
-    hideResults() {
-      this.showResults = false;
-    },
+    //   await store.dispatch("storeVotingCompleted", true);
+    //   console.log(outcome);
+    //   await store.dispatch("storeResultsPerStation", outcome);
+    //   this.showResults = true;
+    // },
   },
 });
 </script>
+
+<style scoped>
+.progress {
+  height: 25px;
+}
+</style>

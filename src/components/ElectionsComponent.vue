@@ -4,7 +4,7 @@
     <div class="container mt-3">
       <button
         class="btn btn-outline-dark"
-        @click="startVoting"
+        @click="startElection"
         v-show="isVisible"
       >
         Begin Voting
@@ -38,7 +38,6 @@ export default defineComponent({
       contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
       isVisible: false,
-      votingStatus: State.Created,
       totalRegisteredVoters: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       voterRegister: [] as any[],
@@ -74,13 +73,13 @@ export default defineComponent({
         }
       });
     },
-    async startVoting() {
+    async startElection() {
       this.isVisible = false;
       const Contract = store.getters.ContractAsOwner;
 
-      await Contract.startVote().then();
+      await Contract.startElection().then();
 
-      store.dispatch("storeVotingStatus", State.Voting);
+      store.dispatch("storeVotingStatus", State.Started);
     },
   },
 });

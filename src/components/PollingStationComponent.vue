@@ -48,7 +48,34 @@
       </div>
     </div>
     <div class="container mt-5" v-show="showPollingStation && votingCompleted">
-      <ResultsTableComponent />
+      <button
+        class="btn btn-outline-success"
+        @click="toggleMoreDetails"
+        v-show="enableMoreDetails"
+      >
+        More details
+      </button>
+      <button
+        class="btn btn-outline-success"
+        @click="toggleMoreDetails"
+        v-show="!enableMoreDetails"
+      >
+        Hide details
+      </button>
+    </div>
+    <div class="container" v-show="loading">
+      <h3>Fetching results. Please wait...</h3>
+      <div class="spinner-border mt-4" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div class="container mt-5" v-show="showMoreDetailsDiv">
+      <ResultsTableComponent
+        :headers="headers"
+        :data="outcome"
+        :counter="candidatesCounter"
+        :totalVotes="totalVotes"
+      />
     </div>
   </div>
 </template>
@@ -59,7 +86,6 @@ import { ethers } from "ethers";
 import store from "@/store";
 import { PollingStation, State } from "@/store/interfaces";
 import ResultsTableComponent from "./ResultsTableComponent.vue";
-import { stdin } from "process";
 
 export default defineComponent({
   name: "PollingStationComponent",
@@ -67,14 +93,51 @@ export default defineComponent({
   data() {
     return {
       ABI: store.getters.ABI,
-      showPollingStation: false,
+      candidatesCounter: 0,
       contractAddress: store.getters.ContractAddress,
       currentAddress: "No Address provided, check your MetaMask Wallet",
+      enableMoreDetails: true,
+      loading: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      outcome: [] as any[],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pollingStationList: [] as any[],
+      showMoreDetailsDiv: false,
+      showPollingStation: false,
       totalRegisteredVoters: 0,
+      totalVotes: 0,
       votingStatus: undefined,
       votingCompleted: false,
+      headers: [
+        {
+          key: "polStationID",
+          value: "Polling Station ID",
+        },
+        {
+          key: "candidate_1",
+          value: "Candidate 1",
+        },
+        {
+          key: "candidate_2",
+          value: "Candidate 2",
+        },
+        {
+          key: "candidate_3",
+          value: "Candidate 3",
+        },
+        {
+          key: "candidate_4",
+          value: "Candidate 4",
+        },
+        {
+          key: "candidate_5",
+          value: "Candidate 5",
+        },
+        {
+          key: "totalVotes",
+          value: "Total Votes",
+        },
+      ],
     };
   },
   created() {
@@ -89,6 +152,7 @@ export default defineComponent({
       await this.fetchContract();
       await this.fetchPollingStations();
       await this.checkStatus();
+      await this.fetchResults();
     },
     async fetchContract() {
       const provider = new ethers.providers.JsonRpcProvider();
@@ -149,6 +213,90 @@ export default defineComponent({
         this.totalRegisteredVoters = await store.getters.RegisteredVoters;
       }
       this.showPollingStation = !this.showPollingStation;
+    },
+    async fetchResults() {
+      const provider = new ethers.providers.JsonRpcProvider();
+
+      const contract = await new ethers.Contract(
+        this.contractAddress,
+        this.ABI,
+        provider
+      );
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.finalResult().then((results: any) => {
+        const sum = parseInt(results.toString());
+        store.dispatch("storeResults", sum);
+      });
+
+      let pollingStations = 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.pollingStationCount().then((res: any) => {
+        pollingStations = parseInt(res.toString());
+      });
+
+      let candidates = 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.candidatesCount().then((res: any) => {
+        candidates = parseInt(res.toString());
+        this.candidatesCounter = candidates;
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await contract.finalResult().then((res: any) => {
+        this.totalVotes = parseInt(res.toString());
+        store.dispatch("storeResults", this.totalVotes);
+      });
+
+      let outcome = new Array(pollingStations);
+
+      for (var i = 0; i < pollingStations; i++) {
+        let counter = 0;
+        let votesPerCandidate: number[] = new Array(candidates);
+
+        for (var j = 0; j < candidates; j++) {
+          await contract
+            .getResultsPerStationPerCandidate(i + 1, j + 1) // Smart contract values are 1 to 5 and 1 to 10, not 0
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then((result: any) => {
+              const votesReceived = parseInt(result.votes.toString());
+              if (votesReceived > 0) {
+                counter += votesReceived;
+              }
+              votesPerCandidate[j] = votesReceived;
+            });
+        }
+        outcome[i] = {
+          stationID: i + 1,
+          results: votesPerCandidate,
+          totalVotes: counter,
+        };
+      }
+      await store.dispatch("storeResultsPerStation", outcome);
+      this.outcome = outcome;
+    },
+
+    async toggleMoreDetails() {
+      this.enableMoreDetails = !this.enableMoreDetails;
+
+      if (!this.enableMoreDetails) {
+        this.loading = true;
+        let outcome = await store.getters.ResultsPerStation;
+
+        // // console.log(JSON.stringify(outcome.Target) == undefined);
+        // // console.log(Object.keys(outcome).length === 0);
+        // if (Object.keys(outcome).length === 0) {
+        //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //   await this.fetchResults().then(async (result: any) => {
+        //     await store.dispatch("storeResultsPerStation", result);
+        //     outcome = result;
+        //   });
+        // }
+
+        this.outcome = outcome;
+        this.loading = false;
+      }
+      this.showMoreDetailsDiv = !this.showMoreDetailsDiv;
     },
   },
 });

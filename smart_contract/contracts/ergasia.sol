@@ -39,7 +39,7 @@ contract Election {
     mapping(address => Voter) public voterRegistry;
     mapping(address => bool) public voters;
     
-    enum State { Created, Voting, Ended }
+    enum State { Created, Started, Voting, Ended }
     State public state;
 
     modifier Owner() {
@@ -159,11 +159,19 @@ contract Election {
     }
 
     /*
-    * @dev Voting process begins. Can only be called by 'owner' when ballot has been created.
+    * @dev Voting process begins. Can only be called by 'owner' when state is created.
     */
-    function startVote() public inState(State.Created) Owner {
+    function startElection() public inState(State.Created) Owner {
+        state = State.Started;
+    }
+
+    /*
+    * @dev Voting process is running. Can only be called by 'owner' when state is started.
+    */
+    function startVoting() public inState(State.Started) Owner {
         state = State.Voting;
     }
+
 
     function castVote(uint _choice, uint _pollingStationID) public inState(State.Voting) returns (bool voted) {
 

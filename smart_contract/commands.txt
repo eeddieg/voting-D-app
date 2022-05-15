@@ -1,8 +1,13 @@
 Terminal A
+Smart Contract root
 remixd -s ./ -u http://localhost:8080
-remixd -s ~/Desktop/webdapp/workspace_ballot/ --remix-ide https://remix.ethereum.org
+
+or else:
+remixd -s path_to_smart_contract.sol --remix-ide https://remix.ethereum.org
 
 
 Ternimal B
-ganache -a 100 --acctKeys accounts.json
+ganache -a 100 -m "..."
 
+Ternimal C
+npm run serve

@@ -17,9 +17,9 @@
       </button>
       <div class="container" v-show="loading">
         <h3>Registering voters. Please wait...</h3>
-      </div>
-      <div class="spinner-border" role="status" v-show="loading">
-        <span class="visually-hidden">Loading...</span>
+        <div class="spinner-border mt-4" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
     </div>
   </div>
@@ -127,3 +127,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.progress {
+  height: 25px;
+}
+</style>

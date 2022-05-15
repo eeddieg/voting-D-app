@@ -7,6 +7,9 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
+    meta: {
+      title: "Voting D-app",
+    },
   },
   {
     path: "/accounts",
@@ -15,6 +18,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "accounts" */ "../views/AccountsView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Accounts",
     },
   },
   {
@@ -24,6 +28,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "ballot" */ "../views/BallotView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Ballot",
     },
   },
   {
@@ -33,6 +38,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "voters" */ "../views/VotersView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Voter Registry",
     },
   },
   {
@@ -44,6 +50,7 @@ const routes: Array<RouteRecordRaw> = [
       ),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Polling Stations",
     },
   },
   {
@@ -53,6 +60,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "contract" */ "../views/ContractView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Contract Info",
     },
   },
   {
@@ -62,6 +70,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "voting" */ "../views/VotingView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app - Voting",
     },
   },
   {
@@ -74,6 +83,7 @@ const routes: Array<RouteRecordRaw> = [
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
     meta: {
       requiresAuth: true,
+      title: "Voting D-app",
     },
   },
   {

@@ -4,10 +4,6 @@ import { ContractFactory, ethers, providers, Wallet } from "ethers";
 export class ContractInfo {
   ElectionJSON = require("../../smart_contract/contracts/artifacts/Election.json");
 
-  // Owner = "0x8d1463E58b6d327Ba92442d95B4e40c42DFA68DA";
-  // OwnerPrivateKey = "0x38168ccec41fda8a0c9e076c276dc25072f6a26c7887a7d19216260f1fc41ca6";
-  // ContractAddress = "0x3848A78a63Be28E00EC3627F9E4db66FBE90AF2c";
-
   // Owner = "0x3C05160d4271AF77c035a4551B8F0711E7d9b5eb";
   // OwnerPrivateKey = "0x219fa91aa1e11124f03c788dffa54ddb3f4a5c96235223877a03c0bcc74ded08";
 

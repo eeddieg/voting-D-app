@@ -77,6 +77,9 @@ export default createStore({
     Results(state) {
       return state.results;
     },
+    ResultsPerStation(state) {
+      return state.resultsPerStation;
+    },
     VoterRegistry(state) {
       return state.voterRegistry;
     },
@@ -145,11 +148,11 @@ export default createStore({
     setVoterRegistry(state, payload) {
       state.voterRegistry = payload;
     },
-    setVotingStatus(state, payload) {
-      state.votingStatus = payload;
-    },
     setVotingCompleted(state, payload) {
       state.votingCompleted = payload;
+    },
+    setVotingStatus(state, payload) {
+      state.votingStatus = payload;
     },
   },
   actions: {

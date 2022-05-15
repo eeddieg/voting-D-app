@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div id="table" class="row justify-content-center mt-3">
-      <h2>Table</h2>
+      <h2>Results Per Polling Station</h2>
       <div class="col-auto">
         <table class="table table-responsive table-striped w-auto">
           <thead>
@@ -12,15 +12,28 @@
             </tr>
           </thead>
           <tbody>
-            <tr scope="row" v-for="(result, index) in outcome" :key="index">
-              <!-- <td>{{ result.pollingStationID }}</td>
-              <td>{{ result.candidateID }}</td>
-              <td>{{ result.votesReceived }}</td>
-              <td>{{ result.totalVotes }}</td> -->
+            <tr scope="row" v-for="(item, index) in data" :key="index">
+              <td>{{ item.stationID }}</td>
+              <td
+                scope="row"
+                v-for="(votes, index) in item.results"
+                :key="index"
+              >
+                {{ votes }}
+              </td>
+              <td>{{ item.totalVotes }}</td>
+            </tr>
+            <tr scope="row">
+              <td></td>
+              <td scope="row" v-for="id in counter" :key="id">
+                <strong>{{ sumVotes(id) }}</strong>
+              </td>
+              <td>
+                <strong>{{ totalVotes }}</strong>
+              </td>
             </tr>
           </tbody>
         </table>
-        {{ outcome }}
       </div>
     </div>
   </div>
@@ -32,23 +45,27 @@ import store from "@/store";
 
 export default defineComponent({
   name: "ResultsTableComponent",
+  props: ["headers", "data", "counter", "totalVotes"],
   data() {
     return {
-      outcome: [],
-      headers: [
-        {
-          key: "",
-          value: "",
-        },
-      ],
+      candidates: store.getters.candidates,
     };
   },
-  mounted() {
-    this.init();
-  },
   methods: {
-    async init() {
-      this.outcome = await store.getters.ResultsPerStation;
+    sumVotes(candidateId: number) {
+      let counter = 0;
+      const data = this.$props.data;
+
+      for (let i = 0; i < data.length; i++) {
+        const results = data[i].results;
+        for (let j = 0; j < results.length; j++) {
+          //IDs start for 1, array from 0
+          if (j == candidateId - 1) {
+            counter += results[j];
+          }
+        }
+      }
+      return counter;
     },
   },
 });
@@ -62,5 +79,11 @@ export default defineComponent({
   max-height: 450px;
   overflow: auto;
   display: inline-block;
+}
+table tr > td:first-child {
+  border-right: 1px solid black;
+}
+table tr > td:last-child {
+  border-left: 1px solid black;
 }
 </style>

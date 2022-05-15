@@ -2,7 +2,7 @@
   <NavBar :isLogged="isLogged" />
   <nav class="navbar navbar-expand-lg">
     <div class="container justify-content-between">
-      <h3>Welcome to Polling D-app</h3>
+      <h3>Welcome to Voting D-app</h3>
       <form class="d-flex">
         <button
           class="btn btn-outline-primary"
