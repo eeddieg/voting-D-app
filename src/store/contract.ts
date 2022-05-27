@@ -18,7 +18,7 @@ export class ContractInfo {
     let accountsList: string[] = [];
     const provider = new ethers.providers.JsonRpcProvider();
 
-    await provider.listAccounts().then((accounts) => {
+    await provider.listAccounts().then((accounts: any) => {
       accountsList = accounts;
       store.dispatch("storeAccounts", accountsList);
     });

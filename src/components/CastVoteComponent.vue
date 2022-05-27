@@ -201,67 +201,6 @@ export default defineComponent({
       }
       return voted;
     },
-    // async getResults() {
-    //   const provider = new ethers.providers.JsonRpcProvider();
-
-    //   const contract = await new ethers.Contract(
-    //     this.contractAddress,
-    //     this.ABI,
-    //     provider
-    //   );
-
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //   await contract.finalResult().then((results: any) => {
-    //     const sum = parseInt(results.toString());
-    //     store.dispatch("storeResults", sum);
-    //     this.results = sum;
-    //   });
-
-    //   let pollingStations = 0;
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //   await contract.pollingStationCount().then((res: any) => {
-    //     pollingStations = parseInt(res.toString());
-    //   });
-
-    //   let candidates = 0;
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //   await contract.candidatesCount().then((res: any) => {
-    //     candidates = parseInt(res.toString());
-    //   });
-
-    //   let outcome = new Array(pollingStations + 1);
-
-    //   for (var i = 1; i <= pollingStations; i++) {
-    //     let counter = 0;
-    //     let votesPerCandidate: number[] = new Array(candidates + 1);
-
-    //     for (var j = 1; j <= candidates; j++) {
-    //       await contract
-    //         .getResultsPerStationPerCandidate(i, j)
-    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //         .then((result: any) => {
-    //           if (j == 0) {
-    //             console.log(result);
-    //           }
-    //           const votesReceived = parseInt(result.votes.toString());
-    //           if (votesReceived > 0) {
-    //             counter += votesReceived;
-    //           }
-    //           votesPerCandidate[j] = votesReceived;
-    //         });
-    //     }
-    //     outcome[i] = {
-    //       stationID: i + 1,
-    //       results: votesPerCandidate,
-    //       totalVotes: counter,
-    //     };
-    //   }
-
-    //   await store.dispatch("storeVotingCompleted", true);
-    //   console.log(outcome);
-    //   await store.dispatch("storeResultsPerStation", outcome);
-    //   this.showResults = true;
-    // },
   },
 });
 </script>
