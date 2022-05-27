@@ -1,7 +1,7 @@
 # Voting-D-app
 Vote D-app using Solidity, Ethers, Vue3 and Typescript
 
-Open a terminal and run script
+Open a terminal and run script: 
 npm run dev
 
 It will run:
