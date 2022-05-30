@@ -54,8 +54,7 @@ export default defineComponent({
       isRegistrationCompleted: store.getters.ElectorateStatus,
       showRegistry: false,
       totalRegisteredVoters: 0,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      registry: [] as any[],
+      registry: store.getters.VoterRegistry,
       headers: [
         {
           key: "index",
@@ -85,6 +84,7 @@ export default defineComponent({
   },
   mounted() {
     this.currentAddress = store.getters.Accounts[0];
+    this.registry = store.getters.VoterRegistry;
   },
   methods: {
     async init() {

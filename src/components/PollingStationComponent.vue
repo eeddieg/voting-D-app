@@ -283,16 +283,6 @@ export default defineComponent({
         this.loading = true;
         let outcome = await store.getters.ResultsPerStation;
 
-        // // console.log(JSON.stringify(outcome.Target) == undefined);
-        // // console.log(Object.keys(outcome).length === 0);
-        // if (Object.keys(outcome).length === 0) {
-        //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //   await this.fetchResults().then(async (result: any) => {
-        //     await store.dispatch("storeResultsPerStation", result);
-        //     outcome = result;
-        //   });
-        // }
-
         this.outcome = outcome;
         this.loading = false;
       }
